@@ -1,0 +1,4 @@
+[
+  {"phase": "P0. 수급·준비", "code": "S-1", "name": "수급 산출물 확인", "status": "미착수", "extraField": "무시되어야 함"},
+  {"phase": "P0. 수급·준비", "code": "S-2", "name": "접근권한 확보", "status": "진행중", "goal": null}
+]

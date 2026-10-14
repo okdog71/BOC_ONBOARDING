@@ -1,0 +1,132 @@
+[
+  {
+    "category": "투입 전 활용",
+    "action": "dev 계정 사전 분석 착수(메뉴 인벤토리·IA 선행)",
+    "purpose": "투입 즉시 가동·학습곡선 단축",
+    "timing": "투입전",
+    "kpi": "메뉴 전수 수집 착수율",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 전 활용",
+    "action": "문서 수급 사전 요청·검토(Phase 0 당기기)",
+    "purpose": "투입 후 분석 시간 단축",
+    "timing": "투입전",
+    "kpi": "수급 목록 확정·신뢰도 등급",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 전 활용",
+    "action": "접근권한 사전 신청(VPN/VDI/Git/Jira/Confluence)",
+    "purpose": "리드타임 선소화",
+    "timing": "투입전",
+    "kpi": "권한 승인율",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 전 활용",
+    "action": "인수인계 일정 사전 협의·확정(KT Plan)",
+    "purpose": "투입 즉시 KT 착수",
+    "timing": "투입전",
+    "kpi": "KT 일정·인계자 확정",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 전 활용",
+    "action": "가이드·아키텍처·replica 온보딩 학습",
+    "purpose": "학습곡선 단축",
+    "timing": "투입전",
+    "kpi": "핵심 도메인 이해도",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 후 가속",
+    "action": "Phase 1~2 팀 분산 병렬화",
+    "purpose": "분석 기간 압축",
+    "timing": "투입후",
+    "kpi": "주차별 커버리지 진척",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 후 가속",
+    "action": "인수인계 + 자체 분석 병행(shadowing)",
+    "purpose": "이중 효과·속도",
+    "timing": "투입후",
+    "kpi": "KT 세션 소화율",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 후 가속",
+    "action": "high-impact 우선(Event/보상지급/Content)",
+    "purpose": "리스크 큰 영역 선제",
+    "timing": "투입후",
+    "kpi": "핵심 도메인 완료율",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "투입 후 가속",
+    "action": "일일 standup + 주간 회고",
+    "purpose": "조기 리스크 감지",
+    "timing": "투입후",
+    "kpi": "회고 주기 준수율",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "일정·범위 관리",
+    "action": "캐치업 baseline 대비 주간 진척 추적",
+    "purpose": "지연 가시화·조기 조정",
+    "timing": "투입후",
+    "kpi": "계획 대비 실적 %",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "일정·범위 관리",
+    "action": "미확인 큐 조기 해소(PUBG/크래프톤 확인)",
+    "purpose": "블로커 제거",
+    "timing": "투입후",
+    "kpi": "⑪확인큐 해소율",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "품질·리스크 완충",
+    "action": "압축 일정에도 Acceptance 게이트 유지",
+    "purpose": "품질 저하 방지",
+    "timing": "상시",
+    "kpi": "Acceptance 통과율",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  },
+  {
+    "category": "품질·리스크 완충",
+    "action": "핵심 인력 bus factor 백업 지정",
+    "purpose": "인력 리스크 완화",
+    "timing": "상시",
+    "kpi": "도메인별 백업 지정률",
+    "note": null,
+    "status": "미착수",
+    "owner": null
+  }
+]

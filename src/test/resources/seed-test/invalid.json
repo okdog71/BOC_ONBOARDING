@@ -1,0 +1,4 @@
+[
+  {"phase": "P0", "code": "I-1", "name": "정상 행", "status": "미착수"},
+  {"phase": "P0", "code": "I-2", "name": "잘못된 상태 행", "status": "없는상태"}
+]

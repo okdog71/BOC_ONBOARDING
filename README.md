@@ -1,0 +1,273 @@
+# boc-onboarding-tracker
+
+KRAFTON BOC/KEC 운영 인수인계·온보딩의 **마일스톤·인수인계(KT)·캐치업·수급/접근/신뢰도·메뉴 분석·이슈큐·RACI·회고**를 관리하는 백엔드(REST API 전용).
+기존 엑셀 `BOC_분석_온보딩_마일스톤_완전판_v3.xlsx`를 시스템화한 것이며, 스택·데이터 모델·규칙의 기준은 [CLAUDE.md](CLAUDE.md)입니다.
+
+| 항목 | 내용 |
+|---|---|
+| 언어/빌드 | Java 17 (JDK 17 이상으로 빌드, `release 17` 고정) · Gradle (Groovy DSL) |
+| 프레임워크 | Spring Boot 3.2.x · Spring Data JPA · Bean Validation · Lombok |
+| DB | MySQL / MariaDB (utf8mb4) · Flyway 마이그레이션 (`V1`~`V3`) |
+| 문서 | springdoc-openapi (Swagger UI) |
+| 테스트 | JUnit 5 · Spring Boot Test · H2 (MySQL 모드, test 프로파일) |
+
+---
+
+## 1. 빠른 시작
+
+### 1-1. DB 준비
+
+```sql
+CREATE DATABASE boc_tracker CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+```
+
+스키마(테이블)는 앱 기동 시 Flyway가 만듭니다. 직접 만들 필요 없습니다.
+
+### 1-2. 계정 설정 (환경변수)
+
+비밀번호는 코드/설정 파일에 넣지 않고 환경변수로 줍니다. (기본값: `DB_USER=root`, `DB_PASSWORD=changeme`)
+
+| 환경변수 | 설명 | 기본값 |
+|---|---|---|
+| `DB_USER` | MySQL 계정 | `root` |
+| `DB_PASSWORD` | MySQL 비밀번호 | `changeme` |
+
+```bash
+# macOS / Linux / Git Bash
+export DB_USER=root
+export DB_PASSWORD='내_비밀번호'
+```
+
+```powershell
+# Windows PowerShell
+$env:DB_USER = 'root'
+$env:DB_PASSWORD = '내_비밀번호'
+```
+
+접속 URL은 `jdbc:mysql://localhost:3306/boc_tracker` (타임존 `Asia/Seoul`, `characterEncoding=UTF-8`)입니다. 다른 호스트/포트를 쓰려면 `src/main/resources/application-local.yml`(gitignore 대상)에서 `spring.datasource.url`을 덮어쓰세요.
+
+### 1-3. 실행
+
+```bash
+./gradlew bootRun            # Windows: .\gradlew.bat bootRun
+```
+
+기동 시 **① Flyway 마이그레이션 → ② seed 적재(테이블이 비어 있을 때만)** 순서로 진행됩니다.
+
+### 1-4. 확인
+
+- Swagger UI: <http://localhost:8080/swagger-ui.html>
+- OpenAPI JSON: <http://localhost:8080/v3/api-docs>
+- 예: <http://localhost:8080/api/summary>, <http://localhost:8080/api/meta/enums>
+
+### 1-5. 빌드 / 테스트
+
+```bash
+./gradlew build              # 컴파일 + 테스트(H2, test 프로파일)
+./gradlew test
+```
+
+커밋 전에는 `./gradlew build` 통과를 확인합니다.
+
+---
+
+## 2. 프로젝트 경로에 한글이 있는 경우 (Windows)
+
+**가능하면 프로젝트를 ASCII 경로(예: `C:\work\boc-onboarding-tracker`)에 두는 것을 권장합니다.**
+
+프로젝트 경로에 한글 등 비-ASCII 문자가 있으면(Windows MS949 환경) Gradle 테스트 워커가 클래스를 로드하지 못해
+`ClassNotFoundException`으로 테스트가 실패합니다. 이를 피하려고 `build.gradle`은 **프로젝트 경로에 비-ASCII 문자가 있을 때만**
+빌드 출력 디렉터리를 아래로 옮깁니다.
+
+```
+%USERPROFILE%\.gradle-build\boc-onboarding-tracker      (예: C:\Users\me\.gradle-build\boc-onboarding-tracker)
+```
+
+- 이 경우 프로젝트 안에 `build/` 폴더가 생기지 않습니다. 산출물(`libs/*.jar`), 테스트 리포트(`reports/tests/test/index.html`)는 위 경로에서 찾으세요.
+- ASCII 경로로 옮기면 분기가 자동으로 비활성화되어 `./build`를 사용합니다. 별도 설정은 필요 없습니다.
+- IntelliJ에서는 Gradle 프로젝트로 임포트하고 **Gradle JVM을 JDK 17 이상**으로 지정하세요.
+
+---
+
+## 3. 프로파일
+
+| profile | 용도 | DB | Flyway | seed 적재 (`app.seed.enabled`) |
+|---|---|---|---|---|
+| `local` (기본) | 로컬 개발·운영 | MySQL/MariaDB (`boc_tracker`) | 활성 | **true** — 비어 있는 도메인만 적재 |
+| `test` | 자동 테스트 | H2 in-memory (MySQL 모드) | 활성 | **false** — 비활성 |
+
+- 프로파일을 지정하지 않으면 `local`이 적용됩니다 (`spring.profiles.default=local`).
+- 공통: `ddl-auto=validate`, `open-in-view=false`. **스키마의 source of truth는 Flyway**입니다.
+- 스키마를 바꿀 때는 기존 `V1`~`V3`를 **수정하지 말고** `V4__...sql`을 추가하세요.
+
+---
+
+## 4. Seed 데이터
+
+`src/main/resources/seed/*.json`(12개)이 기동 시 적재됩니다. 프로젝트 루트의 `seed/`는 원본이며, 실행 시에는 **classpath 사본**을 읽습니다.
+원본을 수정했다면 `src/main/resources/seed/`로 다시 복사하세요.
+
+| 파일 | 도메인 |
+|---|---|
+| `milestones.json` | Milestone |
+| `handover-sessions.json` | HandoverSession |
+| `catchup-actions.json` | CatchupAction |
+| `supply-docs.json` | SupplyDoc |
+| `access-items.json` | AccessItem |
+| `doc-reliability.json` | DocReliability |
+| `menu-inventory.json` | MenuInventory |
+| `mega-processes.json` | MegaProcess |
+| `interfaces.json` | InterfaceLink |
+| `issue-queue.json` | IssueQueue |
+| `raci-assignments.json` | RaciAssignment |
+| `review-logs.json` | ReviewLog (현재 빈 배열 `[]`) |
+
+`AnalysisCard`는 seed 파일이 없습니다.
+
+**적재 규칙**
+
+1. **도메인별로** 테이블이 비어 있을 때만(`count()==0`) 적재합니다. 데이터가 하나라도 있으면 그 도메인은 skip → **재기동해도 중복 적재되지 않습니다.**
+2. 각 JSON 배열을 `*Request` DTO로 읽어 검증(Bean Validation) 후 `service.create`로 저장합니다.
+3. 도메인 단위 **all-or-nothing**: 한 건이라도 검증/저장에 실패하면 그 도메인은 통째로 롤백되고 `ERROR` 로그가 남습니다(다른 도메인과 기동은 계속).
+4. JSON의 알 수 없는 필드는 무시하되 `WARN` 로그를 남깁니다. 파일이 없거나 빈 배열이면 조용히 skip합니다.
+5. 특정 도메인만 다시 넣고 싶으면 해당 테이블을 비우고(`DELETE FROM milestone;`) 재기동하세요. 다른 도메인은 건드리지 않습니다.
+
+---
+
+## 5. 로컬(MySQL) 검증 절차
+
+처음 한 번 아래 순서로 확인하세요. (자동 테스트는 H2 기준이므로 MySQL에서의 확인은 이 절차로 합니다.)
+
+**(a) Flyway V1~V3 마이그레이션 성공**
+
+```bash
+./gradlew bootRun
+```
+로그에 다음이 보여야 합니다.
+```
+Migrating schema `boc_tracker` to version "1 - schema"
+Migrating schema `boc_tracker` to version "2 - schema"
+Migrating schema `boc_tracker` to version "3 - schema"
+Successfully applied 3 migrations ...
+```
+```sql
+USE boc_tracker;
+SELECT version, description, success FROM flyway_schema_history;   -- 3행, success = 1
+SHOW TABLES;                                                        -- 13개 도메인 테이블 + flyway_schema_history
+```
+
+**(b) seed 도메인별 건수 로그** (최초 기동)
+```
+[seed] Milestone 21건 적재 (milestones.json)
+[seed] HandoverSession 24건 적재 (handover-sessions.json)
+ ... (도메인별)
+[seed] 도메인별 적재 건수: {Milestone=21, HandoverSession=24, CatchupAction=13, SupplyDoc=27, AccessItem=11,
+  DocReliability=3, MenuInventory=9, MegaProcess=14, InterfaceLink=8, IssueQueue=4, RaciAssignment=9, ReviewLog=0}
+```
+`GET /api/summary`의 `total`이 위 건수와 같고, 한글이 깨지지 않는지(예: `GET /api/milestones/1`의 `name`) 확인합니다.
+
+**(c) 재기동 시 skip**
+
+앱을 종료했다가 다시 `./gradlew bootRun` 하면 모두 skip되어야 합니다.
+```
+[seed] Milestone skip — 기존 데이터 21건
+ ...
+[seed] 도메인별 적재 건수: {Milestone=0, HandoverSession=0, ...}
+```
+```sql
+SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
+```
+
+문제가 있으면: Flyway 실패 → `flyway_schema_history`의 실패 행 확인 후 DB를 재생성 / 한글 깨짐 → DB·테이블이 `utf8mb4`인지, JDBC URL에 `characterEncoding=UTF-8`이 있는지 확인.
+
+---
+
+## 6. API
+
+- 공통 응답 래퍼: `ApiResponse<T> { success, data, error }`. 오류는 `error: { code, message, fieldErrors[] }`.
+- 목록은 `?page=0&size=20&sort=id,asc` (기본 size 20, 정렬 `id ASC`)이며 `data`는 `{ content, page, size, totalElements, totalPages }`입니다.
+- 상태 변경 `PATCH /{id}/status`의 body는 모두 `{ "status": "<허용값>" }`입니다 (SupplyDoc은 `supplyStatus`, MenuInventory는 `analysisStatus` 필드를 변경).
+- 오류 코드: 검증 실패 `400 VALIDATION_ERROR`, 형식 오류 `400 BAD_REQUEST`, 미존재 `404 NOT_FOUND`, 중복/제약 위반 `409 CONFLICT`, 그 외 `500 INTERNAL_ERROR`.
+- Swagger UI에는 한글 태그 15개(도메인 13 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
+  (목록 200/400 · 단건 200/404 · 생성 201/400/409 · 수정 200/400/404/409 · 상태변경 200/400/404 · 삭제 204/404)가 문서화됩니다.
+  총 77개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
+- 도메인 공통 엔드포인트: `GET /api/{resource}` · `GET /{id}` · `POST` · `PUT /{id}` · `DELETE /{id}` (+ status가 있는 도메인은 `PATCH /{id}/status`).
+
+| # | 도메인 | 경로 | 목록 필터 | 필수 필드 | PATCH `/status` |
+|---|---|---|---|---|---|
+| 1 | Milestone | `/api/milestones` | status, phase | phase, code, name | O |
+| 2 | HandoverSession | `/api/handover-sessions` | status, week, category | week, category, topic | O |
+| 3 | CatchupAction | `/api/catchup-actions` | status, timing | category, action | O |
+| 4 | SupplyDoc | `/api/supply-docs` | supplyStatus, category | category, name | O (`supplyStatus`) |
+| 5 | AccessItem | `/api/access-items` | status, category | category, target | O |
+| 6 | MegaProcess | `/api/mega-processes` | l0 | l0, l1 | - |
+| 7 | InterfaceLink | `/api/interface-links` | devCheck | systemName | - |
+| 8 | DocReliability | `/api/doc-reliabilities` | grade, freshness | docName | - |
+| 9 | MenuInventory | `/api/menu-inventories` | status(=analysisStatus), priority, domain, devCheck | menu | O (`analysisStatus`) |
+| 10 | IssueQueue | `/api/issue-queues` | status, type | item | O |
+| 11 | RaciAssignment | `/api/raci-assignments` | status | domainGroup | O |
+| 12 | ReviewLog | `/api/review-logs` | status | round (정수 ≥ 1) | O |
+| 13 | AnalysisCard | `/api/analysis-cards` | status, domain | menuName | O |
+| - | Meta | `GET /api/meta/enums` | - | - | - |
+| - | Summary | `GET /api/summary` | - | - | - |
+
+### 메타: `GET /api/meta/enums`
+
+통제 어휘(드롭다운) 허용값을 `{ 그룹명: [허용값...] }`으로 돌려줍니다. 그룹: `milestoneStatus, handoverStatus, ktStage, week, category,
+catchupTiming, supplyStatus, existence, freshness, accessStatus, grade, codeFit, priority, generation, devCheck, issueType, issueStatus`.
+`ktStage`는 `설명·병행`처럼 `·`로 이은 복합 표기도 허용됩니다.
+
+### 요약: `GET /api/summary`
+
+도메인별 `{ total, byStatus }` 구조입니다. 허용 상태값은 0건이어도 코드값 표 순서대로 포함됩니다.
+`menu`는 `byPriority`(상/중/하, priority 미지정 행이 있으면 `미지정`)가 추가되고, 상태가 없는 `megaProcess`/`interfaceLink`/`docReliability`는 `total`만 있습니다.
+도메인당 group-by 1쿼리(menu만 2쿼리), 총 14쿼리로 계산합니다.
+
+```json
+{
+  "success": true,
+  "data": {
+    "milestone": { "total": 21, "byStatus": { "미착수": 21, "진행중": 0, "완료": 0, "보류": 0 } },
+    "menu": {
+      "total": 9,
+      "byStatus": { "미착수": 9, "진행중": 0, "완료": 0, "보류": 0 },
+      "byPriority": { "상": 0, "중": 0, "하": 0, "미지정": 9 }
+    },
+    "megaProcess": { "total": 14 }
+  }
+}
+```
+(일부 도메인만 발췌)
+
+---
+
+## 7. 통제 어휘(코드값) 관리
+
+- 허용값의 단일 출처는 `common/meta/CodeValues`이고 `GET /api/meta/enums`가 이를 노출합니다 (CLAUDE.md 4장 '코드값' 표와 동일).
+- DTO의 `@EnumValue(allowed = {...})`는 어노테이션 제약상 **리터럴**로 적습니다.
+- `CodeValuesDriftTest`가 모든 DTO의 `@EnumValue` 리터럴이 `CodeValues`와 **순서까지 일치**하는지 검증하고, 등록되지 않은 `@EnumValue` 필드가 있으면 실패합니다.
+  새 코드값/도메인을 추가하면 이 테스트의 `bindings()`에 한 줄 추가하세요.
+
+---
+
+## 8. 패키지 구조
+
+```
+com.grovesoft.boctracker
+├─ common/        web(ApiResponse, ErrorResponse, GlobalExceptionHandler, PageResponse)
+│                 entity(BaseEntity, StatusCount, GroupCount) · validation(@EnumValue) · meta(CodeValues, /api/meta)
+│                 docs(ApiTags, OpenApiConfig, *Responses 공통 응답코드 애너테이션)
+├─ milestone/ handover/ catchup/ supplydoc/ access/ docreliability/ menu/
+│  megaprocess/ interfacelink/ analysiscard/ issue/ raci/ review/
+│                 # 도메인 = Entity · Repository · Service · Mapper(수동) · Controller · dto/(Request, Response, StatusRequest)
+├─ summary/       # GET /api/summary
+└─ seed/          # SeedDataLoader · SeedTargetRegistry(파일↔도메인 매핑) · SeedTarget
+```
+
+레이어 규칙: `Controller → Service → Repository`, Entity는 API에 직접 노출하지 않음(항상 DTO), 생성자 주입, 트랜잭션은 Service(조회는 `readOnly`).
+
+## 9. 참고
+
+- **컬럼명**: MySQL 예약어와 충돌하는 필드는 컬럼명만 바꿨습니다 — `usage → usage_desc`, `procedure → procedure_desc`, `data → data_desc`, `round → round_no`. 엔티티 필드/JSON 키는 CLAUDE.md 그대로입니다.
+- **관계(FK)**: v1은 느슨한 문자열 참조입니다(예: `MenuInventory.knownIssue`는 IssueQueue의 `item` 식별 문자열). 정규화 FK는 v2 과제.
+- **민감정보**: 계정 비밀번호·토큰·개인정보는 저장하지 않습니다.

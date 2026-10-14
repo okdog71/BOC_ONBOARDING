@@ -1,0 +1,40 @@
+# ---- Gradle ----
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+# 프로젝트 경로에 비-ASCII 문자가 있을 때 build.gradle 이 빌드 출력을 옮기는 위치는
+# 저장소 밖(~/.gradle-build)이라 별도 제외가 필요 없다. 혹시 프로젝트 안에 생기는 경우를 대비:
+.gradle-build/
+
+# ---- IDE ----
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+bin/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- 로컬 비밀/환경 설정 (커밋 금지) ----
+application-local.yml
+application-local.yaml
+application-local.properties
+application-*-local.yml
+.env
+.env.*
+
+# ---- Claude Code 로컬 설정 ----
+.claude/settings.local.json
+
+# ---- 로그/덤프 ----
+*.log
+*.hprof
+HELP.md

@@ -1,0 +1,54 @@
+[
+  {
+    "type": "이슈",
+    "item": "enroll 매칭 회귀",
+    "content": "다중 oesEventId 이벤트에서 플랫폼 불일치 → OES 400 → 500",
+    "impact": "LIVE 장애",
+    "basis": "KEC-01 / KEC 가이드 §5-1",
+    "confirmWith": "커밋 8d89c197 작성자",
+    "owner": null,
+    "status": "미착수",
+    "targetDate": null,
+    "action": null,
+    "note": null
+  },
+  {
+    "type": "미확인",
+    "item": "OES 멱등성",
+    "content": "동일 유저 2회 enroll 동작 미문서화",
+    "impact": "중복 지급 리스크",
+    "basis": "KEC-OES / KEC 가이드 §5-6",
+    "confirmWith": "PUBG(#external-api/PHQ)",
+    "owner": null,
+    "status": "미착수",
+    "targetDate": null,
+    "action": null,
+    "note": null
+  },
+  {
+    "type": "미확인",
+    "item": "OES rate limit",
+    "content": "rate limit 값 미확인",
+    "impact": "피크 장애",
+    "basis": "KEC 가이드 §5-6",
+    "confirmWith": "PUBG(#external-api/PHQ)",
+    "owner": null,
+    "status": "미착수",
+    "targetDate": null,
+    "action": null,
+    "note": null
+  },
+  {
+    "type": "이슈",
+    "item": "staging→live OES",
+    "content": "staging이 라이브 OES 참조",
+    "impact": "라이브 데이터 오염",
+    "basis": "KEC-06 / KEC 가이드 §5-3",
+    "confirmWith": "KRAFTON 운영/PUBG",
+    "owner": null,
+    "status": "미착수",
+    "targetDate": null,
+    "action": null,
+    "note": null
+  }
+]

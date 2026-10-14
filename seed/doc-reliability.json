@@ -1,0 +1,38 @@
+[
+  {
+    "docName": "BOC 가이드(2026-07-09, develop)",
+    "source": "내부 가이드",
+    "lastUpdated": "2026-07-09",
+    "freshness": "현행",
+    "grade": "B",
+    "verifyMethod": "dev 콘솔·코드 대조",
+    "gap": "미확인·회귀 다수 명시(참고 주의)",
+    "codeFit": null,
+    "owner": null,
+    "note": null
+  },
+  {
+    "docName": "KEC 가이드",
+    "source": "내부 가이드",
+    "lastUpdated": null,
+    "freshness": "현행",
+    "grade": "B",
+    "verifyMethod": "코드 대조",
+    "gap": "§5 미해결 과제·알려진 회귀 참조",
+    "codeFit": null,
+    "owner": null,
+    "note": null
+  },
+  {
+    "docName": "SOW(2026-07-02)",
+    "source": "계약 문서",
+    "lastUpdated": "2026-07-02",
+    "freshness": "현행",
+    "grade": "A",
+    "verifyMethod": "-",
+    "gap": "범위·역할 근거(정본)",
+    "codeFit": null,
+    "owner": null,
+    "note": null
+  }
+]

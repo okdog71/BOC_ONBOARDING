@@ -1,0 +1,156 @@
+[
+  {
+    "l0": "이벤트 운영",
+    "l1": "이벤트 설정",
+    "l2": "이벤트 생성",
+    "l3": "기본정보 입력",
+    "relatedMenu": "이벤트 관리",
+    "relatedService": "leo-console-event",
+    "externalLink": "-",
+    "outputData": "이벤트 메타(MongoDB)",
+    "note": null
+  },
+  {
+    "l0": "이벤트 운영",
+    "l1": "미션 설정",
+    "l2": "미션 구성",
+    "l3": "미션/조건 설정",
+    "relatedMenu": "미션 관리",
+    "relatedService": "leo-console-event",
+    "externalLink": "OES",
+    "outputData": "미션 정의",
+    "note": null
+  },
+  {
+    "l0": "이벤트 운영",
+    "l1": "보상 설정",
+    "l2": "보상 구성",
+    "l3": "보상/수량 설정",
+    "relatedMenu": "보상 관리",
+    "relatedService": "leo-console-event",
+    "externalLink": "KOS",
+    "outputData": "보상 정의",
+    "note": null
+  },
+  {
+    "l0": "이벤트 운영",
+    "l1": "지급 처리",
+    "l2": "보상 지급",
+    "l3": "enroll/progress/지급",
+    "relatedMenu": "(운영/자동)",
+    "relatedService": "leo-console-event",
+    "externalLink": "OES/KOS",
+    "outputData": "지급 이력",
+    "note": null
+  },
+  {
+    "l0": "이벤트 운영",
+    "l1": "통계/정산",
+    "l2": "집계",
+    "l3": "통계 조회·정산",
+    "relatedMenu": "통계",
+    "relatedService": "leo-console-event",
+    "externalLink": "-",
+    "outputData": "리포트",
+    "note": null
+  },
+  {
+    "l0": "콘텐츠 운영",
+    "l1": "콘텐츠 등록",
+    "l2": "등록/편집",
+    "l3": "콘텐츠 작성",
+    "relatedMenu": "콘텐츠 관리",
+    "relatedService": "leo-content",
+    "externalLink": "-",
+    "outputData": "콘텐츠(MySQL/S3)",
+    "note": null
+  },
+  {
+    "l0": "콘텐츠 운영",
+    "l1": "미디어/파일",
+    "l2": "업로드",
+    "l3": "파일/CDN 등록",
+    "relatedMenu": "미디어",
+    "relatedService": "파일업로드 API",
+    "externalLink": "-",
+    "outputData": "미디어(S3/CDN)",
+    "note": null
+  },
+  {
+    "l0": "콘텐츠 운영",
+    "l1": "노출 관리",
+    "l2": "GNB/메뉴",
+    "l3": "노출 설정",
+    "relatedMenu": "GNB/메뉴",
+    "relatedService": "namespace/authority",
+    "externalLink": "-",
+    "outputData": "노출 구성",
+    "note": null
+  },
+  {
+    "l0": "콘텐츠 운영",
+    "l1": "FOC 반영",
+    "l2": "공개",
+    "l3": "공개웹 반영",
+    "relatedMenu": "-",
+    "relatedService": "leo-web-*",
+    "externalLink": "-",
+    "outputData": "FOC 노출",
+    "note": null
+  },
+  {
+    "l0": "운영 거버넌스",
+    "l1": "서비스모델",
+    "l2": "namespace",
+    "l3": "서비스/리다이렉트",
+    "relatedMenu": "네임스페이스",
+    "relatedService": "leo-console-namespace",
+    "externalLink": "-",
+    "outputData": "namespace",
+    "note": null
+  },
+  {
+    "l0": "운영 거버넌스",
+    "l1": "권한 관리",
+    "l2": "Role/Menu",
+    "l3": "권한 구성",
+    "relatedMenu": "권한",
+    "relatedService": "leo-console-authority",
+    "externalLink": "-",
+    "outputData": "Role/Menu/Path/Template",
+    "note": null
+  },
+  {
+    "l0": "운영 거버넌스",
+    "l1": "계정 관리",
+    "l2": "운영자",
+    "l3": "계정/세션",
+    "relatedMenu": "인증",
+    "relatedService": "leo-console-auth",
+    "externalLink": "KRAFTON ID",
+    "outputData": "계정",
+    "note": null
+  },
+  {
+    "l0": "리딤/주문",
+    "l1": "쿠폰/리딤",
+    "l2": "발급/사용",
+    "l3": "쿠폰 처리",
+    "relatedMenu": "리딤",
+    "relatedService": "leo-redeem",
+    "externalLink": "KOS(Coupon/GPP)",
+    "outputData": "쿠폰",
+    "note": null
+  },
+  {
+    "l0": "리딤/주문",
+    "l1": "엔타이틀먼트",
+    "l2": "주문",
+    "l3": "지급 권한",
+    "relatedMenu": "주문",
+    "relatedService": "leo-order",
+    "externalLink": "KOS(Entitlement)",
+    "outputData": "주문",
+    "note": null
+  }
+]

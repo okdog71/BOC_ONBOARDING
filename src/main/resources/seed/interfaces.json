@@ -1,0 +1,82 @@
+[
+  {
+    "systemName": "PUBG OES",
+    "direction": "BOC↔",
+    "interfaceName": "enroll/progress API",
+    "usage": "외부 미션/보상 연동",
+    "auth": "고정 토큰(미확인)",
+    "data": "미션/지급",
+    "devCheck": null,
+    "note": null
+  },
+  {
+    "systemName": "Tencent BigManager",
+    "direction": "BOC↔",
+    "interfaceName": "IDIP",
+    "usage": "미션·보상 연동",
+    "auth": "-",
+    "data": "미션/보상",
+    "devCheck": null,
+    "note": null
+  },
+  {
+    "systemName": "KRAFTON BigManager(BGMI)",
+    "direction": "BOC↔",
+    "interfaceName": "API",
+    "usage": "미션·보상 연동",
+    "auth": "-",
+    "data": "미션/보상",
+    "devCheck": null,
+    "note": null
+  },
+  {
+    "systemName": "KOS",
+    "direction": "BOC→",
+    "interfaceName": "Entitlement/EventBridge/Coupon/GPP",
+    "usage": "보상 지급·연동",
+    "auth": "-",
+    "data": "지급",
+    "devCheck": null,
+    "note": null
+  },
+  {
+    "systemName": "KRAFTON ID",
+    "direction": "BOC←",
+    "interfaceName": "SSO/인증",
+    "usage": "운영자/이용자 인증",
+    "auth": "SSO",
+    "data": "인증",
+    "devCheck": null,
+    "note": null
+  },
+  {
+    "systemName": "Twitch / Chzzk",
+    "direction": "BOC↔",
+    "interfaceName": "Drops",
+    "usage": "Drops 연동",
+    "auth": "-",
+    "data": "Drops",
+    "devCheck": null,
+    "note": null
+  },
+  {
+    "systemName": "FOC(공개웹)",
+    "direction": "BOC→",
+    "interfaceName": "leo-web-* 공유",
+    "usage": "콘텐츠·이벤트 노출 반영",
+    "auth": "-",
+    "data": "콘텐츠/이벤트",
+    "devCheck": null,
+    "note": null
+  },
+  {
+    "systemName": "데이터스토어",
+    "direction": "-",
+    "interfaceName": "MySQL/Redis/MongoDB/Kafka/S3",
+    "usage": "영속·캐시·메시징·저장",
+    "auth": "-",
+    "data": "운영 데이터",
+    "devCheck": null,
+    "note": null
+  }
+]
