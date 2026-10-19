@@ -7,6 +7,8 @@ import com.grovesoft.boctracker.common.docs.GetResponses;
 import com.grovesoft.boctracker.common.docs.ListResponses;
 import com.grovesoft.boctracker.common.docs.StatusResponses;
 import com.grovesoft.boctracker.common.docs.UpdateResponses;
+import com.grovesoft.boctracker.common.ordering.OrderRequest;
+import java.util.List;
 import com.grovesoft.boctracker.common.web.ApiResponse;
 import com.grovesoft.boctracker.common.web.PageResponse;
 import com.grovesoft.boctracker.handover.dto.HandoverSessionRequest;
@@ -39,16 +41,30 @@ public class HandoverSessionController {
 
     private final HandoverSessionService service;
 
-    @Operation(summary = "인수인계 세션 목록 조회", description = "status, week, category 필터 + 페이징. 기본 정렬 id ASC")
+    @Operation(summary = "인수인계 세션 목록 조회",
+            description = "status, week, category, person(인계자/인수자), q(코드·주제·도메인 검색), overdue=true(지연만) 필터 + 페이징. 기본 정렬 id ASC")
     @ListResponses
     @GetMapping
     public ApiResponse<PageResponse<HandoverSessionResponse>> list(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String week,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String person,
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "false") boolean overdue,
             @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return ApiResponse.ok(PageResponse.of(service.search(status, week, category, pageable), r -> r));
+        return ApiResponse.ok(PageResponse.of(
+                service.search(status, week, category, person, q, overdue, pageable), r -> r));
     }
+
+    @Operation(summary = "인수인계 세션 그룹 내 순서 변경(드래그앤드롭)",
+            description = "group(주차 W1~W4) 과 그 그룹 전체 id 를 새 순서로 전달. 코드는 바뀌지 않고 No. 만 바뀐다. 목록이 맞지 않으면 400")
+    @UpdateResponses
+    @PutMapping("/order")
+    public ApiResponse<List<HandoverSessionResponse>> reorder(@Valid @RequestBody OrderRequest request) {
+        return ApiResponse.ok(service.reorder(request.group(), request.ids()));
+    }
+
 
     @Operation(summary = "인수인계 세션 단건 조회")
     @GetResponses

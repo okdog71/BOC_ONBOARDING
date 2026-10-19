@@ -12,7 +12,11 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.1",
+    "supplyDocCodes": [
+      "B.1"
+    ]
   },
   {
     "week": "W1",
@@ -27,7 +31,14 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.1",
+    "supplyDocCodes": [
+      "B.4"
+    ],
+    "accessItemCodes": [
+      "AC.8"
+    ]
   },
   {
     "week": "W1",
@@ -42,7 +53,11 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.1",
+    "accessItemCodes": [
+      "AC.7"
+    ]
   },
   {
     "week": "W1",
@@ -57,7 +72,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.1"
   },
   {
     "week": "W1",
@@ -72,7 +88,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.1"
   },
   {
     "week": "W1",
@@ -87,7 +104,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.1"
   },
   {
     "week": "W2",
@@ -102,7 +120,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.2"
   },
   {
     "week": "W2",
@@ -117,7 +136,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.2"
   },
   {
     "week": "W2",
@@ -132,7 +152,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.2"
   },
   {
     "week": "W2",
@@ -147,7 +168,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.2"
   },
   {
     "week": "W2",
@@ -162,7 +184,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.2"
   },
   {
     "week": "W2",
@@ -177,7 +200,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.2"
   },
   {
     "week": "W2",
@@ -192,7 +216,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.2"
   },
   {
     "week": "W3",
@@ -207,7 +232,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.3"
   },
   {
     "week": "W3",
@@ -222,7 +248,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.3"
   },
   {
     "week": "W3",
@@ -237,7 +264,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.3"
   },
   {
     "week": "W3",
@@ -252,7 +280,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.3"
   },
   {
     "week": "W3",
@@ -267,7 +296,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.3"
   },
   {
     "week": "W3",
@@ -282,7 +312,11 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.3",
+    "supplyDocCodes": [
+      "C.2"
+    ]
   },
   {
     "week": "W4",
@@ -297,7 +331,11 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.4",
+    "supplyDocCodes": [
+      "C.3"
+    ]
   },
   {
     "week": "W4",
@@ -312,7 +350,11 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.4",
+    "supplyDocCodes": [
+      "C.5"
+    ]
   },
   {
     "week": "W4",
@@ -327,7 +369,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.4"
   },
   {
     "week": "W4",
@@ -342,7 +385,8 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.4"
   },
   {
     "week": "W4",
@@ -357,6 +401,7 @@
     "status": "미착수",
     "handoverFrom": null,
     "handoverTo": null,
-    "plannedDate": null
+    "plannedDate": null,
+    "milestoneCode": "HO.4"
   }
 ]

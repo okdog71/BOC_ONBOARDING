@@ -3,6 +3,9 @@ package com.grovesoft.boctracker.milestone;
 import com.grovesoft.boctracker.common.web.BusinessRuleException;
 import com.grovesoft.boctracker.common.web.ConflictException;
 import com.grovesoft.boctracker.common.web.NotFoundException;
+import com.grovesoft.boctracker.handover.HandoverSession;
+import com.grovesoft.boctracker.handover.HandoverSessionRepository;
+import com.grovesoft.boctracker.link.LinkService;
 import com.grovesoft.boctracker.milestone.Milestone.CheckItemDraft;
 import com.grovesoft.boctracker.milestone.dto.CheckItemsRequest;
 import com.grovesoft.boctracker.milestone.dto.MilestoneRequest;
@@ -34,12 +37,15 @@ public class MilestoneService {
     private final MilestoneRepository repository;
     private final MilestoneMapper mapper;
     private final Clock clock;
+    private final LinkService linkService;
+    private final HandoverSessionRepository handoverRepository;
 
     public Page<MilestoneResponse> search(String status, String phase, String owner, String q,
                                           boolean overdueOnly, Pageable pageable) {
         LocalDate today = today();
+        LinkService.Snapshot snapshot = linkService.snapshot();
         return repository.search(blankToNull(status), blankToNull(phase), blankToNull(owner), blankToNull(q),
-                overdueOnly, today, pageable).map(m -> mapper.toResponse(m, today));
+                overdueOnly, today, pageable).map(m -> mapper.toResponse(m, today, linkService.forMilestone(m, snapshot)));
     }
 
     public MilestoneResponse get(Long id) {
@@ -69,10 +75,12 @@ public class MilestoneService {
             throw new BusinessRuleException("마일스톤 코드는 변경할 수 없습니다: " + entity.getCode());
         }
         String oldPhase = entity.getPhase();
+        boolean moving = !oldPhase.equals(source.getPhase());
+        int nextOrder = moving ? repository.maxSortOrder(source.getPhase()) + 1 : 0;   // 옮기기 전에 계산
         entity.update(source, today());
-        if (!oldPhase.equals(entity.getPhase())) {
+        if (moving) {
             // 단계 이동: 새 단계의 맨 뒤로, 옛 단계는 번호를 다시 매긴다. 코드는 그대로.
-            entity.changeSortOrder(repository.maxSortOrder(entity.getPhase()) + 1);
+            entity.changeSortOrder(nextOrder);
             repository.flush();
             resequence(oldPhase);
         }
@@ -93,6 +101,10 @@ public class MilestoneService {
         List<Milestone> dependents = repository.findDependents(id);
         if (!dependents.isEmpty()) {
             throw new ConflictException("다른 마일스톤이 선행으로 참조 중이라 삭제할 수 없습니다: " + codes(dependents));
+        }
+        List<String> sessions = handoverRepository.findByMilestoneId(id).stream().map(HandoverSession::getCode).toList();
+        if (!sessions.isEmpty()) {
+            throw new ConflictException("인수인계 세션이 연결되어 있어 삭제할 수 없습니다: " + String.join(", ", sessions));
         }
         String phase = entity.getPhase();
         repository.delete(entity);
@@ -269,7 +281,7 @@ public class MilestoneService {
     }
 
     private MilestoneResponse toResponse(Milestone m) {
-        return mapper.toResponse(m, today());
+        return mapper.toResponse(m, today(), linkService.forMilestone(m, linkService.snapshot()));
     }
 
     private LocalDate today() {

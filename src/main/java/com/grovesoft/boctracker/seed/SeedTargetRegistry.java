@@ -75,18 +75,19 @@ public class SeedTargetRegistry {
     private final ReviewLogRepository reviewRepository;
     private final ReviewLogService reviewService;
 
+    /** 적재 순서 = 의존 순서: 마일스톤 → 수급/접근 → 인수인계(앞의 셋을 코드로 참조) → 나머지 */
     public List<SeedTarget<?>> targets() {
         return List.of(
                 new SeedTarget<>("Milestone", "milestones.json", MilestoneRequest.class,
                         milestoneRepository::count, milestoneService::create),
-                new SeedTarget<>("HandoverSession", "handover-sessions.json", HandoverSessionRequest.class,
-                        handoverRepository::count, handoverService::create),
-                new SeedTarget<>("CatchupAction", "catchup-actions.json", CatchupActionRequest.class,
-                        catchupRepository::count, catchupService::create),
                 new SeedTarget<>("SupplyDoc", "supply-docs.json", SupplyDocRequest.class,
                         supplyDocRepository::count, supplyDocService::create),
                 new SeedTarget<>("AccessItem", "access-items.json", AccessItemRequest.class,
                         accessRepository::count, accessService::create),
+                new SeedTarget<>("HandoverSession", "handover-sessions.json", HandoverSessionRequest.class,
+                        handoverRepository::count, handoverService::create),
+                new SeedTarget<>("CatchupAction", "catchup-actions.json", CatchupActionRequest.class,
+                        catchupRepository::count, catchupService::create),
                 new SeedTarget<>("DocReliability", "doc-reliability.json", DocReliabilityRequest.class,
                         docReliabilityRepository::count, docReliabilityService::create),
                 new SeedTarget<>("MenuInventory", "menu-inventory.json", MenuInventoryRequest.class,

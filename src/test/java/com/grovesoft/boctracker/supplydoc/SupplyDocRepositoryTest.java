@@ -1,5 +1,6 @@
 package com.grovesoft.boctracker.supplydoc;
 
+import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.grovesoft.boctracker.common.entity.StatusCount;
@@ -75,10 +76,10 @@ class SupplyDocRepositoryTest {
         repository.save(b());
         em.flush();
 
-        assertThat(repository.search("미요청", null, PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
-        assertThat(repository.search(null, "A. 기획·화면", PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
-        assertThat(repository.search(null, null, PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
-        assertThat(repository.search("없는값", null, PageRequest.of(0, 10)).getTotalElements()).isZero();
+        assertThat(repository.search("미요청", null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
+        assertThat(repository.search(null, "A. 기획·화면", null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
+        assertThat(repository.search(null, null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
+        assertThat(repository.search("없는값", null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isZero();
     }
 
     @Test

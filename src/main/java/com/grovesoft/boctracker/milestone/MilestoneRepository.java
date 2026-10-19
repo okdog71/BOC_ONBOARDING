@@ -34,6 +34,8 @@ public interface MilestoneRepository extends JpaRepository<Milestone, Long> {
 
     boolean existsByCode(String code);
 
+    java.util.Optional<Milestone> findByCode(String code);
+
     List<Milestone> findByPhase(String phase);
 
     List<Milestone> findByPhaseOrderBySortOrderAscIdAsc(String phase);

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grovesoft.boctracker.analysiscard.AnalysisCardRepository;
+import com.grovesoft.boctracker.catchup.CatchupActionRepository;
 import com.grovesoft.boctracker.milestone.MilestoneRepository;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -33,6 +34,8 @@ class SeedDataLoaderStartupTest {
     MilestoneRepository milestoneRepository;
     @Autowired
     AnalysisCardRepository analysisCardRepository;
+    @Autowired
+    CatchupActionRepository catchupRepository;
     @Autowired
     ObjectMapper om;
 
@@ -75,13 +78,14 @@ class SeedDataLoaderStartupTest {
     @Test
     void 도메인별로_판단한다_비워진_도메인만_다시_적재된다() throws Exception {
         Map<String, Long> before = counts();
-        milestoneRepository.deleteAll();
+        // 마일스톤은 인수인계 세션이 FK 로 참조하므로(삭제 불가), 참조되지 않는 도메인으로 확인한다.
+        catchupRepository.deleteAll();
 
         Map<String, Integer> result = loader.loadAll();
 
-        assertThat(result).containsEntry("Milestone", jsonSize("milestones.json"));
+        assertThat(result).containsEntry("CatchupAction", jsonSize("catchup-actions.json"));
         result.forEach((domain, n) -> {
-            if (!domain.equals("Milestone")) {
+            if (!domain.equals("CatchupAction")) {
                 assertThat(n).as(domain).isZero();
             }
         });

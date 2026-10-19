@@ -73,10 +73,10 @@ class AccessItemRepositoryTest {
         repository.save(b());
         em.flush();
 
-        assertThat(repository.search("미신청", null, PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
-        assertThat(repository.search(null, "저장소", PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
-        assertThat(repository.search(null, null, PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
-        assertThat(repository.search("없는값", null, PageRequest.of(0, 10)).getTotalElements()).isZero();
+        assertThat(repository.search("미신청", null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
+        assertThat(repository.search(null, "저장소", null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
+        assertThat(repository.search(null, null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
+        assertThat(repository.search("없는값", null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isZero();
     }
 
     @Test

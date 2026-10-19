@@ -199,6 +199,18 @@ class MilestoneRulesTest {
     }
 
     @Test
+    void 번호가_큰_항목을_다른_단계로_옮겨도_번호에_빈틈이_없다() throws Exception {
+        create(noCode("P0. 단계", "a"));
+        create(noCode("P0. 단계", "b"));
+        long c = create(noCode("P0. 단계", "c"));          // P0 의 No.3
+        long x = create(noCode("P1. 다음", "x"));          // P1 의 No.1
+
+        send(put("/api/milestones/{id}", c), noCode("P1. 다음", "c")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.no").value(2));   // 4 가 아니라 2
+        mvc.perform(get("/api/milestones/{id}", x)).andExpect(jsonPath("$.data.no").value(1));
+    }
+
+    @Test
     void 범위_선행은_화면_순서_기준으로_해석() throws Exception {
         long a = create(noCode("P0. 단계", "a"));
         long b = create(noCode("P0. 단계", "b"));

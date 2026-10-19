@@ -40,6 +40,7 @@ class AccessItemControllerTest {
         m.put("usage", "소스 열람");
         m.put("envScope", "dev");
         m.put("procedure", "사내 포털 신청");
+        m.put("status", "신청");   // 신청일이 있으면 상태는 신청 이후여야 한다
         m.put("requestedDate", "2026-11-02");
         m.put("owner", "인프라 담당");
         return m;
@@ -71,9 +72,9 @@ class AccessItemControllerTest {
                 .andExpect(jsonPath("$.data.procedure").value("사내 포털 신청"))
                 .andExpect(jsonPath("$.data.requestedDate").value("2026-11-02"))
                 .andExpect(jsonPath("$.data.owner").value("인프라 담당"))
-                .andExpect(jsonPath("$.data.status").value("미신청"));
+                .andExpect(jsonPath("$.data.status").value("신청"));
 
-        mvc.perform(get("/api/access-items").param("status", "미신청"))
+        mvc.perform(get("/api/access-items").param("status", "신청"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content", hasSize(1)))
                 .andExpect(jsonPath("$.data.content[0].id").value(id));

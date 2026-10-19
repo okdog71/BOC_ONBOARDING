@@ -1,6 +1,7 @@
 package com.grovesoft.boctracker.milestone.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.grovesoft.boctracker.link.LinkedProgress;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +31,7 @@ public record MilestoneResponse(
         List<String> blockedBy,
         @Schema(description = "체크리스트 진척") Progress progress,
         @Schema(description = "체크리스트 항목") List<CheckItemResponse> checkItems,
+        @Schema(description = "산출물이 가리키는 메뉴(②③⑤)의 실제 진행 현황") List<LinkedProgress> links,
         @Schema(description = "생성 시각", example = "2026-11-02T09:30:00") LocalDateTime createdAt,
         @Schema(description = "수정 시각", example = "2026-11-02T09:30:00") LocalDateTime updatedAt) {
 

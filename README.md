@@ -190,16 +190,16 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 - 오류 코드: 검증 실패 `400 VALIDATION_ERROR`, 형식 오류 `400 BAD_REQUEST`, 미존재 `404 NOT_FOUND`, 중복/제약 위반 `409 CONFLICT`, 그 외 `500 INTERNAL_ERROR`.
 - Swagger UI에는 한글 태그 15개(도메인 13 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
   (목록 200/400 · 단건 200/404 · 생성 201/400/409 · 수정 200/400/404/409 · 상태변경 200/400/404 · 삭제 204/404)가 문서화됩니다.
-  총 84개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
+  총 90개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
 - 도메인 공통 엔드포인트: `GET /api/{resource}` · `GET /{id}` · `POST` · `PUT /{id}` · `DELETE /{id}` (+ status가 있는 도메인은 `PATCH /{id}/status`).
 
 | # | 도메인 | 경로 | 목록 필터 | 필수 필드 | PATCH `/status` |
 |---|---|---|---|---|---|
 | 1 | Milestone | `/api/milestones` | status, phase, owner, q, overdue | phase, code, name | O |
-| 2 | HandoverSession | `/api/handover-sessions` | status, week, category | week, category, topic | O |
+| 2 | HandoverSession | `/api/handover-sessions` | status, week, category, person, q, overdue | week, category, topic | O |
 | 3 | CatchupAction | `/api/catchup-actions` | status, timing | category, action | O |
-| 4 | SupplyDoc | `/api/supply-docs` | supplyStatus, category | category, name | O (`supplyStatus`) |
-| 5 | AccessItem | `/api/access-items` | status, category | category, target | O |
+| 4 | SupplyDoc | `/api/supply-docs` | supplyStatus, category, owner, q, overdue | category, name | O (`supplyStatus`) |
+| 5 | AccessItem | `/api/access-items` | status, category, owner, q, overdue | category, target | O |
 | 6 | MegaProcess | `/api/mega-processes` | l0 | l0, l1 | - |
 | 7 | InterfaceLink | `/api/interface-links` | devCheck | systemName | - |
 | 8 | DocReliability | `/api/doc-reliabilities` | grade, freshness | docName | - |
@@ -233,6 +233,25 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 **No.**(`no`)는 코드와 별개인 단계 내 표시 순서(1부터 연속)이며 드래그로 바뀐다. 새 항목/단계 이동은 그 단계 맨 뒤.
 `A~B` 범위 선행은 저장 시점의 **화면 표시 순서** 기준으로 풀린다.
 (V8 마이그레이션이 기존 `M0.x`~`M3.x` → `P0.x`~`P3.x` 로 변환, `HO.x` 는 유지하고 선행 조건 문자열·seed JSON 도 함께 갱신)
+
+### ②수급 산출물 · ③접근권한 · ⑤인수인계 (마일스톤과 같은 수준으로 고도화)
+
+| 항목 | 규칙 |
+|---|---|
+| 코드(불변) | 수급 `{구분 알파벳}.{n}` (A.1, B.4 …, 접두 없으면 `S`) · 접근 `AC.{n}` · 인수인계 `{주차}.{n}` (W1.2 …). 생성 시 서버 자동 부여, 변경 시 `400` |
+| No.(순서) | 그룹(구분/주차) 내 표시 순서. 새 항목·그룹 이동은 맨 뒤, 삭제 시 재정렬. `PUT /{base}/order {group, ids[]}` 로 드래그 순서 저장 |
+| 그룹명 변경 | 수급·접근: `PATCH /{base}/groups {from,to}` (병합 가능, 코드 유지). 인수인계 주차(W1~W4)는 고정 |
+| 수급 | 요청/수령일 자동 기록 · `overdue`(필요일 경과 & 미수령) · 경고(수령인데 존재=없음/위치 비어 있음/최신성 미확인/담당 없음) |
+| 접근 | 신청/승인일 보정 · 일자-상태 모순 `400`(승인일은 승인 상태에서만, 신청일은 미신청 제외, 승인일≥신청일) · `leadTimeDays` · 용도에 `접근 전제`가 있는 항목이 미승인이면 다른 접근에 경고 · 민감정보 입력 금지 |
+| 인수인계 | 완료일 자동 기록 · `overdue`(예정일 경과 & 미완료) · `blockers`(미수령 수급·미승인 접근·"전 세션 완료"인 마무리 세션의 미완료 세션 — 차단하지 않고 경고) |
+
+**메뉴·문서 링크** — 텍스트로만 있던 참조를 FK로 정규화(원문은 유지):
+- 인수인계 세션 → 마일스톤(`milestoneCode`, 예: W1.* → HO.1), 선행 수급(`supplyDocCodes`), 선행 접근(`accessItemCodes`). PUT 은 전체 교체, 없는 코드는 `400`.
+- 참조 중인 수급·접근·마일스톤의 삭제는 `409`(참조하는 세션 코드를 알려 줌). 수급·접근 응답의 `requiredBySessions` 가 역방향 링크.
+- 마일스톤 응답의 `links`: 산출물의 시트 기호가 가리키는 메뉴의 **실제 진행 현황** — ② 수령/해당없음 n/전체, ③ 승인 n/전체, ⑤ 연결 세션 완료 n/전체(연결 세션이 없으면 예정일 확정 n/전체).
+- `GET /api/summary/links`: 끊어진 링크 점검(세션의 "수급:/접근:" 텍스트에 연결 FK 없음, 마일스톤 없는 세션, 존재하지 않는 선행 코드, 세션 없는 HO 마일스톤). 대시보드에 표시.
+- 프런트 시트 기호 매핑은 `frontend/src/links.tsx`(②③⑤ 활성, 나머지는 "준비 중" 칩).
+- seed 적재 순서: 마일스톤 → 수급/접근 → 인수인계(코드로 참조). V9/V10 이 기존 DB의 코드·순서·연결을 백필한다.
 
 ### 메타: `GET /api/meta/enums`
 
@@ -299,7 +318,8 @@ com.grovesoft.boctracker
 
 # 프런트엔드 (`frontend/`)
 
-React 18 + TypeScript + Vite 5. 현재 화면: 대시보드(`/api/summary`), 마일스톤(고도화), 인수인계(KT).
+React 18 + TypeScript + Vite 5. 현재 화면: 대시보드(+링크 점검), 마일스톤, ② 수급 산출물, ③ 접근권한, ⑤ 인수인계(KT).
+②③⑤는 `src/resource/` 의 공통 화면(`ManagedPage`/`ResourceDialog`)을 설정만 달리해 만들며, 다음 도메인도 같은 방식으로 추가한다.
 
 마일스톤 화면: 단계별 색상 그룹 · No./코드 열 · 드래그앤드롭(같은 단계 내, ▲▼ 버튼 병행) 순서 변경 · 상단 요약 칩(상태/지연) · 검색/단계/담당 필터 · 팝업(보기/편집/추가/삭제) ·
 체크리스트 진척 · 선행/산출물 링크 칩(`src/links.tsx` 에 시트기호 ②~⑬ → 라우트 매핑, 화면이 생기면 `ready: true`) ·

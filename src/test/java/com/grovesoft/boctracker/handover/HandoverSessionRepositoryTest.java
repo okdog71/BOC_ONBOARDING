@@ -71,8 +71,8 @@ class HandoverSessionRepositoryTest {
         repository.save(session("W2", "BOC", "예정"));
         em.flush();
 
-        assertThat(repository.search(null, "W1", null, PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
-        assertThat(repository.search("예정", "W1", "BOC", PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
-        assertThat(repository.search(null, null, null, PageRequest.of(0, 10)).getTotalElements()).isEqualTo(3);
+        assertThat(repository.search(null, "W1", null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
+        assertThat(repository.search("예정", "W1", "BOC", null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(1);
+        assertThat(repository.search(null, null, null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(3);
     }
 }

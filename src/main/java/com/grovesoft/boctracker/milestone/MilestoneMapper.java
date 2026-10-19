@@ -1,5 +1,6 @@
 package com.grovesoft.boctracker.milestone;
 
+import com.grovesoft.boctracker.link.LinkedProgress;
 import com.grovesoft.boctracker.milestone.dto.MilestoneRequest;
 import com.grovesoft.boctracker.milestone.dto.MilestoneResponse;
 import com.grovesoft.boctracker.milestone.dto.MilestoneResponse.CheckItemResponse;
@@ -30,7 +31,7 @@ public class MilestoneMapper {
     }
 
     /** @param today 지연(overdue) 판단 기준일 */
-    public MilestoneResponse toResponse(Milestone e, LocalDate today) {
+    public MilestoneResponse toResponse(Milestone e, LocalDate today, List<LinkedProgress> links) {
         List<CheckItemResponse> items = e.getCheckItems().stream()
                 .map(i -> new CheckItemResponse(i.getId(), i.getTitle(), i.isDone())).toList();
         int done = (int) items.stream().filter(CheckItemResponse::done).count();
@@ -42,7 +43,7 @@ public class MilestoneMapper {
                 e.getDoneCriteria(), e.getNote(), e.getTargetDate(), e.getCompletedDate(), e.isOverdue(today),
                 e.getPredecessors().stream().map(Milestone::getCode).sorted().toList(),
                 e.incompletePredecessors().stream().map(Milestone::getCode).sorted().toList(),
-                progress, items, e.getCreatedAt(), e.getUpdatedAt());
+                progress, items, links, e.getCreatedAt(), e.getUpdatedAt());
     }
 
     private String blankToNull(String s) {

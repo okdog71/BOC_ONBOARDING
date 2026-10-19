@@ -87,7 +87,8 @@ class OpenApiDocsTest {
     @Test
     void 공통_응답코드_패턴이_문서에_반영된다() throws Exception {
         for (Op op : operations()) {
-            if (op.path().equals("/api/summary") || op.path().equals("/api/meta/enums")) {
+            if (op.path().equals("/api/summary") || op.path().equals("/api/summary/links")
+                    || op.path().equals("/api/meta/enums")) {
                 assertThat(codes(op)).as(op.path()).containsExactly("200");
                 continue;
             }
@@ -121,7 +122,7 @@ class OpenApiDocsTest {
         for (String d : List.of("mega-processes", "interface-links", "doc-reliabilities")) {
             domains.put(d, false);
         }
-        Set<String> expected = new TreeSet<>(List.of("GET /api/meta/enums", "GET /api/summary"));
+        Set<String> expected = new TreeSet<>(List.of("GET /api/meta/enums", "GET /api/summary", "GET /api/summary/links"));
         domains.forEach((d, hasStatus) -> {
             expected.addAll(List.of("GET /api/" + d, "POST /api/" + d, "GET /api/" + d + "/{id}",
                     "PUT /api/" + d + "/{id}", "DELETE /api/" + d + "/{id}"));
@@ -129,6 +130,10 @@ class OpenApiDocsTest {
                 expected.add("PATCH /api/" + d + "/{id}/status");
             }
         });
+        // 수급/접근/인수인계 고도화: 그룹 내 순서 변경(+ 수급·접근은 구분명 일괄 변경)
+        expected.addAll(List.of("PUT /api/supply-docs/order", "PATCH /api/supply-docs/groups",
+                "PUT /api/access-items/order", "PATCH /api/access-items/groups",
+                "PUT /api/handover-sessions/order"));
         // 마일스톤 고도화 엔드포인트(단계/담당자/체크리스트)
         expected.addAll(List.of("GET /api/milestones/phases", "PATCH /api/milestones/phases",
                 "GET /api/milestones/owners", "PUT /api/milestones/order", "PUT /api/milestones/{id}/check-items",
@@ -138,7 +143,7 @@ class OpenApiDocsTest {
         operations().forEach(op -> actual.add(op.method() + " " + op.path()));
 
         assertThat(actual).isEqualTo(expected);
-        assertThat(actual).hasSize(84);
+        assertThat(actual).hasSize(90);
     }
 
     @Test
