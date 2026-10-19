@@ -308,3 +308,82 @@ a.file-name:hover { color: var(--accent); text-decoration: underline; }
 .add-item input { width: 100%; padding: 7px 10px; font: inherit; color: var(--fg); background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-s); }
 
 #resource-form, #milestone-form { display: flex; flex-direction: column; gap: 20px; }
+
+/* ================= 상세 팝업 v2: 위계 · 라벨/값 구분 · 편집 상태 ================= */
+:root {
+  --label-bg: #eef1f6;
+  --label-fg: #364152;
+  --field-line: #a3adbd;
+  --edit-accent: #b45309;
+  --edit-bg: #fff8ec;
+}
+:root[data-theme='dark'] {
+  --label-bg: #262d38;
+  --label-fg: #c3cbd8;
+  --field-line: #566174;
+  --edit-accent: #f0b35a;
+  --edit-bg: #2a2418;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --label-bg: #262d38;
+    --label-fg: #c3cbd8;
+    --field-line: #566174;
+    --edit-accent: #f0b35a;
+    --edit-bg: #2a2418;
+  }
+}
+
+/* 머리: 분류 → 제목(h2) → 상태 */
+.dlg-head { padding: 20px 24px 16px; }
+.dlg-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+.dlg h2 { margin: 6px 0 10px; font-size: 22px; font-weight: 700; line-height: 1.3; }
+
+/* 구역 제목(h3): 굵은 제목 + 왼쪽 강조선 */
+.dlg-body { gap: 26px; }
+.sec-head { margin-bottom: 10px; padding: 0; border: 0; }
+.sec-head h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; letter-spacing: 0; color: var(--fg); }
+.sec-head h3::before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: hsl(var(--hue, 220) 62% 50%); }
+
+/* 읽기: 라벨 칸(회색 바탕·굵게) | 값 칸(흰 바탕) 의 표 */
+.kv-grid { display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: 0; margin: 0; border: 1px solid var(--line); border-radius: var(--radius-m); overflow: hidden; }
+.kv, .kv.wide { display: contents; }
+.kv dt { margin: 0; padding: 10px 14px; background: var(--label-bg); color: var(--label-fg); font-size: 13px; font-weight: 650; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
+.kv dd { margin: 0; padding: 10px 14px; background: var(--card); color: var(--fg); font-size: 14px; border-bottom: 1px solid var(--line); word-break: break-word; }
+.kv:last-child dt, .kv:last-child dd { border-bottom: 0; }
+
+/* 핵심 수치 타일 */
+.fact { padding: 10px 14px; background: var(--card); border-color: var(--line); border-top: 3px solid var(--line); }
+.fact-label { font-size: 12px; font-weight: 600; color: var(--label-fg); }
+.fact-value { font-size: 16px; font-weight: 700; }
+.fact.tone-ok { border-top-color: var(--ok); }
+.fact.tone-warn { border-top-color: var(--warn); }
+.fact.tone-danger { border-top-color: var(--danger); }
+
+/* 편집: 같은 표 모양에 입력 칸이 뚜렷하게 */
+.form-grid { display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: 0; border: 1px solid var(--field-line); border-radius: var(--radius-m); overflow: hidden; background: var(--card); }
+.ff, .ff.wide { display: contents; }
+.ff-label { display: block; padding: 12px 14px; background: var(--label-bg); color: var(--label-fg); font-size: 13px; font-weight: 650; border-bottom: 1px solid var(--line); border-right: 1px solid var(--field-line); }
+.ff-control { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 8px 12px; background: var(--card); border-bottom: 1px solid var(--line); }
+.ff:last-child .ff-label, .ff:last-child .ff-control { border-bottom: 0; }
+.ff input, .ff select, .ff textarea { padding: 8px 10px; font-size: 14px; color: var(--fg); background: var(--card); border: 1.5px solid var(--field-line); border-radius: var(--radius-s); }
+.ff input:hover, .ff select:hover, .ff textarea:hover { border-color: var(--accent); }
+.ff input:focus, .ff select:focus, .ff textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.ff input.readonly { border-style: dashed; border-width: 1px; background: var(--bg); color: var(--muted); }
+.ff-hint { font-size: 12px; color: var(--muted); }
+.req { color: var(--danger); font-weight: 700; }
+
+/* 편집 중 표시: 머리 색, 상단 띠, 본문 바탕 */
+.modal.dlg.is-edit { border-top-color: var(--edit-accent); }
+.is-edit .dlg-head { background: var(--edit-bg); border-bottom-color: color-mix(in srgb, var(--edit-accent) 40%, var(--line)); }
+.is-edit .dlg-body { background: var(--bg); }
+.is-edit .sec-head h3::before { background: var(--edit-accent); }
+.flag-edit { color: var(--edit-accent); background: var(--card); font-weight: 700; }
+.banner-edit { color: var(--edit-accent); border-color: color-mix(in srgb, var(--edit-accent) 45%, transparent); background: var(--edit-bg); }
+.is-edit .dlg-foot { background: var(--edit-bg); border-top-color: color-mix(in srgb, var(--edit-accent) 40%, var(--line)); }
+.dlg-foot .primary { font-weight: 650; }
+
+@media (max-width: 640px) {
+  .kv-grid, .form-grid { grid-template-columns: 104px minmax(0, 1fr); }
+  .kv dt, .ff-label { padding: 10px; }
+}

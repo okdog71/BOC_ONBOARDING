@@ -13,6 +13,7 @@ export function DialogFrame({
   meta,
   hue,
   className = '',
+  mode = 'view',
   backdropClass = '',
   closeRef,
   locked = false,
@@ -32,6 +33,8 @@ export function DialogFrame({
   /** 그룹 색상(상단 띠) */
   hue?: number;
   className?: string;
+  /** edit 이면 머리·본문 색과 입력 칸이 편집 상태로 바뀐다 */
+  mode?: 'view' | 'edit';
   backdropClass?: string;
   /** 닫기 버튼 ref(열릴 때 포커스용) */
   closeRef?: Ref<HTMLButtonElement>;
@@ -51,7 +54,7 @@ export function DialogFrame({
       }}
     >
       <div
-        className={`modal dlg ${className}`.trim()}
+        className={`modal dlg${mode === 'edit' ? ' is-edit' : ''} ${className}`.trim()}
         role="dialog"
         aria-modal="true"
         aria-label={label}
@@ -87,9 +90,9 @@ export function FootBar({ left, right }: { left?: ReactNode; right?: ReactNode }
   );
 }
 
-export function Banner({ tone = 'warn', title, children }: { tone?: 'warn' | 'danger' | 'info'; title?: string; children?: ReactNode }) {
+export function Banner({ tone = 'warn', title, children }: { tone?: 'warn' | 'danger' | 'info' | 'edit'; title?: string; children?: ReactNode }) {
   return (
-    <div className={`banner banner-${tone}`} role={tone === 'info' ? 'note' : 'alert'}>
+    <div className={`banner banner-${tone}`} role={tone === 'info' || tone === 'edit' ? 'note' : 'alert'}>
       {title && <b>{title}</b>}
       {children}
     </div>
@@ -166,8 +169,10 @@ export function FormField({
         {label}
         {required && <i className="req" aria-hidden="true"> *</i>}
       </span>
-      {children}
-      {hint && <small className="ff-hint">{hint}</small>}
+      <span className="ff-control">
+        {children}
+        {hint && <small className="ff-hint">{hint}</small>}
+      </span>
     </Tag>
   );
 }

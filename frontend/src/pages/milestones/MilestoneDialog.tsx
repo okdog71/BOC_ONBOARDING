@@ -269,6 +269,7 @@ export default function MilestonePanel({
         save();
       }}
     >
+      <Banner tone="edit">입력한 뒤 아래 "{creating ? '추가' : '저장'}"을 눌러야 반영됩니다. 취소하면 변경 내용이 사라집니다.</Banner>
       <Section title="기본">
         <FormGrid>
           <FormField label="단계" required>
@@ -429,10 +430,14 @@ export default function MilestonePanel({
       title={creating ? '새 마일스톤' : milestone.name}
       hue={draft.phase ? phaseHue(draft.phase) : undefined}
       locked={editing}
+      mode={editing ? 'edit' : 'view'}
       onClose={onClose}
       meta={
-        creating ? undefined : (
+        creating ? (
+          <span className="flag flag-edit">✎ 새로 만드는 중</span>
+        ) : (
           <>
+            {editing && <span className="flag flag-edit">✎ 편집 중</span>}
             <StatusBadge status={milestone.status} />
             {milestone.overdue && <span className="flag flag-danger">지연</span>}
             <span className="muted">

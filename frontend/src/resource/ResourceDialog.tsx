@@ -264,6 +264,7 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
         save();
       }}
     >
+      <Banner tone="edit">입력한 뒤 아래 "{creating ? '추가' : '저장'}"을 눌러야 반영됩니다. 취소하면 변경 내용이 사라집니다.</Banner>
       {config.notice && <Banner tone="info">{config.notice}</Banner>}
       {sections.map(([name, fields]) => (
         <Section key={name} title={name}>
@@ -293,10 +294,14 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
       title={title}
       hue={groupValue ? phaseHue(groupValue) : undefined}
       locked={editing}
+      mode={editing ? 'edit' : 'view'}
       onClose={onClose}
       meta={
-        creating ? undefined : (
+        creating ? (
+          <span className="flag flag-edit">✎ 새로 만드는 중</span>
+        ) : (
           <>
+            {editing && <span className="flag flag-edit">✎ 편집 중</span>}
             <StatusBadge status={statusValue} />
             {row.overdue && <span className="flag flag-danger">지연</span>}
             <span className="muted">
