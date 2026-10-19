@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api';
-import { SheetChips } from '../../links';
+import { LinkChip, SheetChips } from '../../links';
 import { nextCodePreview } from '../../phase';
 import { StatusSelect } from '../../components';
 import type { Milestone, MilestoneInput } from '../../types';
@@ -320,7 +320,22 @@ export default function MilestonePanel({
             <dd>{milestone.checkpoint ?? '-'}</dd>
             <dt>산출물</dt>
             <dd>
-              {milestone.output ?? '-'} <SheetChips text={milestone.output} />
+              {milestone.output ?? '-'} <SheetChips text={milestone.output} links={milestone.links} />
+            </dd>
+            <dt>연결 현황</dt>
+            <dd>
+              {milestone.links.length === 0 && <span className="muted">산출물이 가리키는 메뉴 연결 없음</span>}
+              {milestone.links.map((l) => (
+                <div key={l.sheet} className="link-progress">
+                  <LinkChip to={l.route} label={`${l.sheet} ${l.label}`} />
+                  <span className="bar-track mini">
+                    <span className="bar-fill" style={{ width: `${l.total ? (l.done / l.total) * 100 : 0}%` }} />
+                  </span>
+                  <span className="small">
+                    {l.metric} {l.done}/{l.total}
+                  </span>
+                </div>
+              ))}
             </dd>
             <dt>완료 기준</dt>
             <dd>{milestone.doneCriteria ?? '-'}</dd>

@@ -7,8 +7,10 @@ export function phaseKey(phase: string): string {
   return m ? m[1].toUpperCase() : 'X';
 }
 
+/** 그룹 띠 색상: 알려진 단계키는 고정색, 나머지는 이름 해시(주차 W1.., 구분명 등) */
 export function phaseHue(phase: string): number {
-  const key = phaseKey(phase);
+  const prefixed = /^([A-Za-z][A-Za-z0-9]*)\s*\./.test(phase.trim());
+  const key = prefixed ? phaseKey(phase) : phase;
   if (key in HUES) return HUES[key];
   let h = 0;
   for (const c of key) h = (h * 31 + c.charCodeAt(0)) % 360;

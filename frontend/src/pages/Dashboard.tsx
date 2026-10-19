@@ -1,7 +1,7 @@
 import { api } from '../api';
 import { State } from '../components';
 import { useAsync } from '../hooks';
-import type { Summary } from '../types';
+import type { LinkReport, Summary } from '../types';
 
 const TITLES: Record<string, string> = {
   milestone: '마일스톤',
@@ -23,8 +23,32 @@ function groupsOf(section: Summary[string]) {
 
 export default function Dashboard() {
   const { data, error, loading } = useAsync(() => api.get<Summary>('/api/summary'), []);
+  const links = useAsync(() => api.get<LinkReport>('/api/summary/links'), []).data;
   return (
     <State loading={loading} error={error}>
+      {links && (
+        <section className={`card link-audit${links.issues.length ? ' has-issues' : ''}`}>
+          <h2>
+            메뉴·문서 링크 점검 <small>{links.issues.length === 0 ? '이상 없음' : `문제 ${links.issues.length}건`}</small>
+          </h2>
+          <ul className="audit-checks">
+            {links.checks.map((c) => (
+              <li key={c.name} className={c.problems ? 'bad' : 'ok'}>
+                {c.problems ? '⚠' : '✓'} {c.name} <span className="muted">({c.checked}건 점검{c.problems ? `, 문제 ${c.problems}` : ''})</span>
+              </li>
+            ))}
+          </ul>
+          {links.issues.length > 0 && (
+            <ul className="audit-issues">
+              {links.issues.map((i) => (
+                <li key={i.source + i.message}>
+                  <b>{i.source}</b> {i.message}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
       <div className="cards">
         {data &&
           Object.entries(data).map(([key, section]) => (

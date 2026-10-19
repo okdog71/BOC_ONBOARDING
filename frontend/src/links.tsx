@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import type { LinkedProgress } from './types';
 
 /**
  * 엑셀 시트 기호(②~⑬) → 화면 라우트 매핑. 단일 출처.
@@ -6,8 +7,8 @@ import { Link } from 'react-router-dom';
  * (안정화되면 백엔드 /api/meta/links 로 이관 예정)
  */
 export const SHEET_LINKS: Record<string, { label: string; to: string; ready: boolean }> = {
-  '②': { label: '수급 산출물', to: '/supply-docs', ready: false },
-  '③': { label: '접근권한', to: '/access-items', ready: false },
+  '②': { label: '수급 산출물', to: '/supply-docs', ready: true },
+  '③': { label: '접근권한', to: '/access-items', ready: true },
   '④': { label: '문서 신뢰도', to: '/doc-reliabilities', ready: false },
   '⑤': { label: '인수인계 일정', to: '/handover-sessions', ready: true },
   '⑥': { label: '캐치업', to: '/catchup-actions', ready: false },
@@ -42,13 +43,34 @@ export function LinkChip({ to, ready = true, label, hint }: { to: string; ready?
 }
 
 /** 산출물 문자열에서 시트 기호를 찾아 이동 칩으로 렌더 */
-export function SheetChips({ text }: { text: string | null | undefined }) {
+export function SheetChips({
+  text,
+  skip = [],
+  links = [],
+}: {
+  text: string | null | undefined;
+  /** 칩으로 만들지 않을 기호(이미 항목 단위 링크로 표시한 것) */
+  skip?: string[];
+  /** 서버가 계산한 실제 진행 현황(있으면 칩에 "수령 3/27" 같은 수치를 덧붙인다) */
+  links?: LinkedProgress[];
+}) {
   return (
     <>
-      {sheetSymbols(text).map((sym) => {
-        const l = SHEET_LINKS[sym];
-        return <LinkChip key={sym} to={l.to} ready={l.ready} label={`${sym} ${l.label}`} />;
-      })}
+      {sheetSymbols(text)
+        .filter((sym) => !skip.includes(sym))
+        .map((sym) => {
+          const l = SHEET_LINKS[sym];
+          const p = links.find((x) => x.sheet === sym);
+          return (
+            <LinkChip
+              key={sym}
+              to={l.to}
+              ready={l.ready}
+              label={`${sym} ${l.label}${p ? ` ${p.done}/${p.total}` : ''}`}
+              hint={p ? `${p.label} — ${p.metric} ${p.done}/${p.total}` : undefined}
+            />
+          );
+        })}
     </>
   );
 }

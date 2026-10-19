@@ -303,7 +303,7 @@ export default function Milestones() {
                         {m.goal && <div className="sub">{m.goal}</div>}
                       </td>
                       <td className="chips">
-                        <SheetChips text={m.output} />
+                        <SheetChips text={m.output} links={m.links} />
                         {m.output && !/[②-⑬]/.test(m.output) && <span className="muted small">{m.output}</span>}
                       </td>
                       <td className="chips" onClick={(e) => e.stopPropagation()}>

@@ -21,6 +21,17 @@ export interface Milestone {
   blockedBy: string[];
   progress: { done: number; total: number; percent: number | null };
   checkItems: CheckItem[];
+  /** 산출물이 가리키는 메뉴(②③⑤)의 실제 진행 현황 */
+  links: LinkedProgress[];
+}
+
+export interface LinkedProgress {
+  sheet: string;
+  label: string;
+  route: string;
+  metric: string;
+  done: number;
+  total: number;
 }
 
 export interface CheckItem {
@@ -52,8 +63,56 @@ export interface MilestoneInput {
   targetDate: string;
 }
 
+export interface SupplyDoc {
+  id: number;
+  code: string;
+  no: number;
+  category: string;
+  name: string;
+  expectedContent: string | null;
+  usagePurpose: string | null;
+  existence: string | null;
+  location: string | null;
+  freshness: string | null;
+  owner: string | null;
+  supplyStatus: string;
+  targetDate: string | null;
+  requestedDate: string | null;
+  receivedDate: string | null;
+  ready: boolean;
+  overdue: boolean;
+  warnings: string[];
+  requiredBySessions: string[];
+  note: string | null;
+}
+
+export interface AccessItem {
+  id: number;
+  code: string;
+  no: number;
+  category: string;
+  target: string;
+  usage: string | null;
+  envScope: string | null;
+  procedure: string | null;
+  status: string;
+  requestedDate: string | null;
+  approvedDate: string | null;
+  targetDate: string | null;
+  leadTimeDays: number | null;
+  ready: boolean;
+  overdue: boolean;
+  prerequisite: boolean;
+  warnings: string[];
+  requiredBySessions: string[];
+  owner: string | null;
+  note: string | null;
+}
+
 export interface HandoverSession {
   id: number;
+  code: string;
+  no: number;
   week: string;
   category: string;
   domain: string | null;
@@ -65,8 +124,21 @@ export interface HandoverSession {
   output: string | null;
   precondition: string | null;
   plannedDate: string | null;
+  completedDate: string | null;
   status: string;
+  overdue: boolean;
+  milestoneCode: string | null;
+  milestoneName: string | null;
+  supplyDocs: { code: string; name: string; status: string; ready: boolean }[];
+  accessItems: { code: string; target: string; status: string; ready: boolean }[];
+  blockers: string[];
+  warnings: string[];
   note: string | null;
+}
+
+export interface LinkReport {
+  checks: { name: string; checked: number; problems: number }[];
+  issues: { severity: string; source: string; message: string }[];
 }
 
 export interface Enums {

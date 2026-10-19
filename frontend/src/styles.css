@@ -144,3 +144,34 @@ td.no { width: 64px; font-variant-numeric: tabular-nums; }
 .ms-row.dragging { opacity: .4; }
 .ms-row.drop-before td { box-shadow: inset 0 2px 0 var(--accent); }
 .ms-row.drop-after td { box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* ---- 수급/접근/인수인계 공통 화면 ---- */
+.page-title { font-size: 18px; margin: 4px 0 10px; }
+.related { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 12px; padding: 8px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
+.related-title { color: var(--muted); font-size: 12px; margin-right: 4px; }
+.related-chip .badge { margin-left: 6px; }
+.badge { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 11px; background: var(--bg); border: 1px solid var(--line); color: var(--muted); }
+.badge.s-완료 { color: #1a8f4a; border-color: #1a8f4a; }
+.badge.s-진행중 { color: var(--accent); border-color: var(--accent); }
+.badge.s-보류 { color: #b7791f; border-color: #b7791f; }
+.chip-ok { color: #1a8f4a; border-color: #1a8f4a; }
+.chip-stat.warn { color: #b7791f; cursor: default; }
+.warn-mark { color: #b7791f; }
+.tag { margin-left: 6px; padding: 0 6px; border-radius: 4px; font-size: 11px; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.notice { padding: 6px 10px; border-radius: 6px; background: var(--bg); color: var(--muted); font-size: 12px; margin: 8px 0; }
+.hint { color: var(--muted); font-weight: 400; }
+.warn-list { margin: 8px 0; padding: 8px 12px 8px 26px; border-radius: 6px; background: rgb(183 121 31 / .12); color: #b7791f; font-size: 13px; }
+.blockers { margin: 10px 0; padding: 8px 12px; border-radius: 6px; border: 1px solid #b7791f; color: #b7791f; font-size: 13px; }
+.blockers ul { margin: 4px 0 0; padding-left: 18px; }
+.pick-list { list-style: none; margin: 0; padding: 6px 8px; max-height: 180px; overflow: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.pick-list li label { display: flex; flex-direction: row; align-items: center; gap: 8px; color: var(--fg); font-size: 13px; padding: 2px 0; }
+.pick-list code { color: var(--muted); font-size: 12px; }
+.pick-list .badge { margin-left: auto; }
+.field-custom { display: flex; flex-direction: column; gap: 3px; color: var(--muted); font-size: 12px; }
+.link-progress { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.link-audit { margin-bottom: 16px; }
+.link-audit.has-issues { border-color: #b7791f; }
+.audit-checks, .audit-issues { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; }
+.audit-checks .ok { color: #1a8f4a; }
+.audit-checks .bad, .audit-issues li { color: #b7791f; }
+td.small, .small { font-size: 12px; }
