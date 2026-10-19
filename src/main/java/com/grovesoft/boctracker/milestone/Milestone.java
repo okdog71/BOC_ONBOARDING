@@ -4,8 +4,15 @@ import com.grovesoft.boctracker.common.entity.BaseEntity;
 import com.grovesoft.boctracker.common.meta.CodeValues;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import lombok.Builder;
+import org.hibernate.annotations.BatchSize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
@@ -52,6 +59,14 @@ public class Milestone extends BaseEntity {
     @Column(length = 1000)
     private String note;
 
+    /** 선행 마일스톤(precondition 문자열의 정규화 표현). */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "milestone_dependency",
+            joinColumns = @JoinColumn(name = "milestone_id"),
+            inverseJoinColumns = @JoinColumn(name = "predecessor_id"))
+    @BatchSize(size = 50)
+    private Set<Milestone> predecessors = new LinkedHashSet<>();
+
     @Builder
     private Milestone(String phase, String code, String name, String goal, String checkpoint, String output,
                       String precondition, String owner, String durationWeeks, String status,
@@ -88,5 +103,10 @@ public class Milestone extends BaseEntity {
 
     public void changeStatus(String status) {
         this.status = status;
+    }
+
+    public void replacePredecessors(Set<Milestone> newPredecessors) {
+        this.predecessors.clear();
+        this.predecessors.addAll(newPredecessors);
     }
 }

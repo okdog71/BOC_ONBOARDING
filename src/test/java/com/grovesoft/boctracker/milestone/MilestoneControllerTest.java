@@ -52,6 +52,26 @@ class MilestoneControllerTest {
     }
 
     @Test
+    void precondition_코드가_선행_FK로_해석된다() throws Exception {
+        create(body("D-1"));
+        create(body("D-2"));
+        Map<String, Object> b = body("D-3");
+        b.put("precondition", "D-1,D-2");
+        long id = create(b);
+
+        mvc.perform(get("/api/milestones/{id}", id))
+                .andExpect(jsonPath("$.data.predecessorCodes", hasSize(2)))
+                .andExpect(jsonPath("$.data.predecessorCodes[0]").value("D-1"));
+
+        b.put("precondition", "현업 인터뷰");
+        mvc.perform(put("/api/milestones/{id}", id).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(b)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.predecessorCodes", hasSize(0)))
+                .andExpect(jsonPath("$.data.precondition").value("현업 인터뷰"));
+    }
+
+    @Test
     void 생성_조회_목록_happy_path() throws Exception {
         long id = create(body("C-1"));
 

@@ -28,7 +28,8 @@ public class MilestoneMapper {
         return new MilestoneResponse(
                 e.getId(), e.getPhase(), e.getCode(), e.getName(), e.getGoal(), e.getCheckpoint(),
                 e.getOutput(), e.getPrecondition(), e.getOwner(), e.getDurationWeeks(), e.getStatus(),
-                e.getDoneCriteria(), e.getNote(), e.getCreatedAt(), e.getUpdatedAt());
+                e.getDoneCriteria(), e.getNote(),
+                e.getPredecessors().stream().map(Milestone::getCode).sorted().toList(), e.getCreatedAt(), e.getUpdatedAt());
     }
 
     private String blankToNull(String s) {

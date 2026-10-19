@@ -2,6 +2,7 @@ package com.grovesoft.boctracker.milestone.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "마일스톤 응답")
 public record MilestoneResponse(
@@ -18,6 +19,7 @@ public record MilestoneResponse(
         @Schema(description = "상태(미착수/진행중/완료/보류)", example = "미착수") String status,
         @Schema(description = "완료 기준", example = "수급 목록 확정·신뢰도 등급 부여") String doneCriteria,
         @Schema(description = "비고", example = "투입 전 착수 권장") String note,
+        @Schema(description = "선행 마일스톤 코드(precondition 에서 해석된 FK)", example = "[\"M0.1\", \"M0.2\"]") List<String> predecessorCodes,
         @Schema(description = "생성 시각", example = "2026-11-02T09:30:00") LocalDateTime createdAt,
         @Schema(description = "수정 시각", example = "2026-11-02T09:30:00") LocalDateTime updatedAt) {
 }
