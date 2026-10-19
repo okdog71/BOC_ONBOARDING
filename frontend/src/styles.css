@@ -22,17 +22,17 @@
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
   color-scheme: light dark;
 }
+/* 테마: data-theme 이 없으면 시스템 설정을 따르고, light/dark 로 고정하면 그 값을 쓴다 */
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #14171d; --fg: #e6e8ec; --muted: #9aa3b2; --card: #1d222b; --line: #2d343f;
+  --accent: #6f8cff; --danger: #ff7b6b; --ok: #4cc27f; --warn: #e0a84a;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14171d;
-    --fg: #e6e8ec;
-    --muted: #9aa3b2;
-    --card: #1d222b;
-    --line: #2d343f;
-    --accent: #6f8cff;
-    --danger: #ff7b6b;
-    --ok: #4cc27f;
-    --warn: #e0a84a;
+  :root:not([data-theme='light']) {
+    --bg: #14171d; --fg: #e6e8ec; --muted: #9aa3b2; --card: #1d222b; --line: #2d343f;
+    --accent: #6f8cff; --danger: #ff7b6b; --ok: #4cc27f; --warn: #e0a84a;
   }
 }
 * { box-sizing: border-box; }
@@ -47,6 +47,7 @@ h1 { font-size: 16px; margin: 0; }
 .shell.nav-open { grid-template-columns: var(--sidebar-w) minmax(0, 1fr); }
 .topbar { grid-column: 1 / -1; position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-4); background: var(--card); border-bottom: 1px solid var(--line); }
 .menu-toggle { border: none; background: transparent; font-size: 18px; padding: var(--space-1) var(--space-2); cursor: pointer; }
+.theme-toggle { margin-left: auto; white-space: nowrap; cursor: pointer; }
 .brand { font-weight: 700; color: var(--fg); text-decoration: none; white-space: nowrap; }
 .breadcrumb { margin-left: var(--space-3); min-width: 0; }
 .breadcrumb ol { display: flex; gap: var(--space-2); list-style: none; margin: 0; padding: 0; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; }

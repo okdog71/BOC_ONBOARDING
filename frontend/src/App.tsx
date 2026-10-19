@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import { useTheme } from './theme';
 import { HOME_PATH, NAV, READY_NAV, findNav } from './nav';
 
 const NARROW = '(max-width: 900px)';
@@ -52,6 +53,7 @@ function Breadcrumb() {
 
 export default function App() {
   const narrow = useIsNarrow();
+  const theme = useTheme();
   const [open, setOpen] = useState<boolean>(() => (window.matchMedia(NARROW).matches ? false : readStoredOpen()));
   const { pathname } = useLocation();
 
@@ -108,6 +110,15 @@ export default function App() {
           BOC 온보딩·인수인계 트래커
         </Link>
         <Breadcrumb />
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={theme.cycle}
+          title="화면 모드 전환: 시스템 → 라이트 → 다크"
+          aria-label={`화면 모드: ${theme.label}. 누르면 ${theme.nextLabel}`}
+        >
+          {theme.icon} {theme.label}
+        </button>
       </header>
       <aside id="lnb" className="sidebar" aria-hidden={!open}>
         <nav aria-label="주 메뉴">
