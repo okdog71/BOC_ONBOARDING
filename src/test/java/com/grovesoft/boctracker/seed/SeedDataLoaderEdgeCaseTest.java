@@ -70,7 +70,7 @@ class SeedDataLoaderEdgeCaseTest {
 
         repository.deleteAll();
         service.create(new MilestoneRequest("P9", "X-1", "기존 데이터", null, null, null, null, null, null,
-                null, null, null));
+                null, null, null, null));
         assertThat(loaderFor("good.json").loadAll()).containsEntry("Milestone", 0);
         assertThat(repository.count()).isEqualTo(1);
     }

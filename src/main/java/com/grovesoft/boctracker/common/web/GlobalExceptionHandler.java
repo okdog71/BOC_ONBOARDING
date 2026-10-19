@@ -46,6 +46,16 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, ErrorResponse.of("NOT_FOUND", e.getMessage()));
     }
 
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBusinessRule(BusinessRuleException e) {
+        return build(HttpStatus.BAD_REQUEST, ErrorResponse.of("BUSINESS_RULE", e.getMessage()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConflictException(ConflictException e) {
+        return build(HttpStatus.CONFLICT, ErrorResponse.of("CONFLICT", e.getMessage()));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<Void>> handleConflict(DataIntegrityViolationException e) {
         log.warn("Data integrity violation: {}", e.getMostSpecificCause().getMessage());

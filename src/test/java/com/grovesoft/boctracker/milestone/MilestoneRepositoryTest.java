@@ -3,6 +3,7 @@ package com.grovesoft.boctracker.milestone;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.grovesoft.boctracker.common.entity.StatusCount;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,9 +68,9 @@ class MilestoneRepositoryTest {
         repository.save(milestone("T-7", "완료"));
         em.flush();
 
-        List<String> codes = repository.search("완료", null, PageRequest.of(0, 10)).map(Milestone::getCode).toList();
+        List<String> codes = repository.search("완료", null, null, null, false, LocalDate.now(), PageRequest.of(0, 10)).map(Milestone::getCode).toList();
         assertThat(codes).containsExactly("T-7");
-        assertThat(repository.search(null, "P0. 수급·준비", PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
-        assertThat(repository.search(null, "없는단계", PageRequest.of(0, 10)).getTotalElements()).isZero();
+        assertThat(repository.search(null, "P0. 수급·준비", null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
+        assertThat(repository.search(null, "없는단계", null, null, false, LocalDate.now(), PageRequest.of(0, 10)).getTotalElements()).isZero();
     }
 }

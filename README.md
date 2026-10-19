@@ -190,12 +190,12 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 - 오류 코드: 검증 실패 `400 VALIDATION_ERROR`, 형식 오류 `400 BAD_REQUEST`, 미존재 `404 NOT_FOUND`, 중복/제약 위반 `409 CONFLICT`, 그 외 `500 INTERNAL_ERROR`.
 - Swagger UI에는 한글 태그 15개(도메인 13 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
   (목록 200/400 · 단건 200/404 · 생성 201/400/409 · 수정 200/400/404/409 · 상태변경 200/400/404 · 삭제 204/404)가 문서화됩니다.
-  총 77개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
+  총 84개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
 - 도메인 공통 엔드포인트: `GET /api/{resource}` · `GET /{id}` · `POST` · `PUT /{id}` · `DELETE /{id}` (+ status가 있는 도메인은 `PATCH /{id}/status`).
 
 | # | 도메인 | 경로 | 목록 필터 | 필수 필드 | PATCH `/status` |
 |---|---|---|---|---|---|
-| 1 | Milestone | `/api/milestones` | status, phase | phase, code, name | O |
+| 1 | Milestone | `/api/milestones` | status, phase, owner, q, overdue | phase, code, name | O |
 | 2 | HandoverSession | `/api/handover-sessions` | status, week, category | week, category, topic | O |
 | 3 | CatchupAction | `/api/catchup-actions` | status, timing | category, action | O |
 | 4 | SupplyDoc | `/api/supply-docs` | supplyStatus, category | category, name | O (`supplyStatus`) |
@@ -210,6 +210,29 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 | 13 | AnalysisCard | `/api/analysis-cards` | status, domain | menuName | O |
 | - | Meta | `GET /api/meta/enums` | - | - | - |
 | - | Summary | `GET /api/summary` | - | - | - |
+
+### 마일스톤 추가 API
+
+| 엔드포인트 | 설명 |
+|---|---|
+| `GET /api/milestones/phases` | 단계 목록(첫 등장 순) + 단계별 전체/완료 건수 |
+| `PUT /api/milestones/order` | 단계 내 순서(No.) 변경(드래그앤드롭) `{phase, ids[]}` — 그 단계 전체 id 를 새 순서로. 목록이 다르면 400 |
+| `PATCH /api/milestones/phases` | 단계명 일괄 변경 `{from,to}` (이미 있는 이름이면 병합) |
+| `GET /api/milestones/owners` | 입력된 담당자 목록(자동완성용) |
+| `PUT /api/milestones/{id}/check-items` | 체크리스트 전체 교체(순서=정렬, 누락 항목 삭제) |
+| `PATCH /api/milestones/{id}/check-items/{itemId}` | 항목 완료 토글 `{done}` |
+| `POST /api/milestones/{id}/check-items/generate` | 체크포인트(`·`/줄바꿈/`;` 구분)로 체크리스트 생성 (이미 있으면 409) |
+
+비즈니스 규칙: 완료 전환 시 `completedDate` 자동 기록(이탈 시 제거) · `overdue` = 목표일 경과 & 미완료 ·
+`blockedBy` = 미완료 선행(경고용, 전이는 막지 않음) · 선행 순환 `400 BUSINESS_RULE` ·
+선행으로 참조 중인 항목의 삭제 `409 CONFLICT` · 코드 중복 `409`.
+
+**코드 체계**: 코드 = `{단계키}.{순번}` (예: `P0.1`, `HO.2`, `P1.5`). 단계명 접두(`P0.`·`HO.`·`P1.` …)가 단계키이며 접두가 없으면 `X`.
+생성 시 서버가 자동 부여(같은 단계키 코드의 최대 순번 + 1, 삭제된 번호는 재사용하지 않음)하고 **이후 변경 불가**(`400`) —
+선행 조건·링크가 코드를 참조하기 때문. 단계 이름을 바꾸거나 다른 단계로 옮겨도 기존 코드는 유지된다.
+**No.**(`no`)는 코드와 별개인 단계 내 표시 순서(1부터 연속)이며 드래그로 바뀐다. 새 항목/단계 이동은 그 단계 맨 뒤.
+`A~B` 범위 선행은 저장 시점의 **화면 표시 순서** 기준으로 풀린다.
+(V8 마이그레이션이 기존 `M0.x`~`M3.x` → `P0.x`~`P3.x` 로 변환, `HO.x` 는 유지하고 선행 조건 문자열·seed JSON 도 함께 갱신)
 
 ### 메타: `GET /api/meta/enums`
 
@@ -271,3 +294,24 @@ com.grovesoft.boctracker
 - **컬럼명**: MySQL 예약어와 충돌하는 필드는 컬럼명만 바꿨습니다 — `usage → usage_desc`, `procedure → procedure_desc`, `data → data_desc`, `round → round_no`. 엔티티 필드/JSON 키는 CLAUDE.md 그대로입니다.
 - **관계(FK)**: v1은 느슨한 문자열 참조입니다(예: `MenuInventory.knownIssue`는 IssueQueue의 `item` 식별 문자열). 정규화 FK는 v2 과제.
 - **민감정보**: 계정 비밀번호·토큰·개인정보는 저장하지 않습니다.
+
+---
+
+# 프런트엔드 (`frontend/`)
+
+React 18 + TypeScript + Vite 5. 현재 화면: 대시보드(`/api/summary`), 마일스톤(고도화), 인수인계(KT).
+
+마일스톤 화면: 단계별 색상 그룹 · No./코드 열 · 드래그앤드롭(같은 단계 내, ▲▼ 버튼 병행) 순서 변경 · 상단 요약 칩(상태/지연) · 검색/단계/담당 필터 · 팝업(보기/편집/추가/삭제) ·
+체크리스트 진척 · 선행/산출물 링크 칩(`src/links.tsx` 에 시트기호 ②~⑬ → 라우트 매핑, 화면이 생기면 `ready: true`) ·
+선행 미완료/체크리스트 미완료 시 상태 변경 확인창 · 단계 이름 일괄 변경.
+딥링크: `/milestones?code=P0.1`, `/milestones?new=1&phase=...`.
+
+```bash
+# 백엔드(8080)를 먼저 기동한 뒤
+cd frontend
+npm install
+npm run dev      # http://localhost:5173  (/api 는 Vite 프록시로 8080에 전달 → CORS 설정 불필요)
+npm run build    # 타입체크 + 프로덕션 빌드(dist/)
+```
+
+Node 18 이상. 나머지 도메인 화면은 `src/pages/Milestones.tsx` 패턴으로 확장합니다.

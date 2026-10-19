@@ -129,11 +129,16 @@ class OpenApiDocsTest {
                 expected.add("PATCH /api/" + d + "/{id}/status");
             }
         });
+        // 마일스톤 고도화 엔드포인트(단계/담당자/체크리스트)
+        expected.addAll(List.of("GET /api/milestones/phases", "PATCH /api/milestones/phases",
+                "GET /api/milestones/owners", "PUT /api/milestones/order", "PUT /api/milestones/{id}/check-items",
+                "PATCH /api/milestones/{id}/check-items/{itemId}",
+                "POST /api/milestones/{id}/check-items/generate"));
         Set<String> actual = new TreeSet<>();
         operations().forEach(op -> actual.add(op.method() + " " + op.path()));
 
         assertThat(actual).isEqualTo(expected);
-        assertThat(actual).hasSize(77);
+        assertThat(actual).hasSize(84);
     }
 
     @Test
