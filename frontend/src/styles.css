@@ -387,3 +387,27 @@ a.file-name:hover { color: var(--accent); text-decoration: underline; }
   .kv-grid, .form-grid { grid-template-columns: 104px minmax(0, 1fr); }
   .kv dt, .ff-label { padding: 10px; }
 }
+
+/* ================= 상세 팝업 v3: 2열(라벨|값 ‖ 라벨|값) 표 ================= */
+.kv-grid, .form-grid {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) 112px minmax(0, 1fr);
+  gap: 1px;
+  margin: 0;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.form-grid { background: var(--field-line); border-color: var(--field-line); }
+.kv, .kv.full, .kv.half, .ff, .ff.full, .ff.half { display: contents; }
+.kv dt, .ff-label { margin: 0; padding: 10px 12px; background: var(--label-bg); color: var(--label-fg); font-size: 13px; font-weight: 650; border: 0; }
+.kv dd, .ff-control { margin: 0; padding: 10px 12px; background: var(--card); color: var(--fg); font-size: 14px; border: 0; word-break: break-word; min-width: 0; }
+.ff-control { display: flex; flex-direction: column; gap: 4px; padding: 7px 10px; }
+.kv.full dd, .ff.full .ff-control { grid-column: 2 / -1; }
+.kv:last-child dt, .kv:last-child dd, .ff:last-child .ff-label, .ff:last-child .ff-control { border: 0; }
+
+@media (max-width: 720px) {
+  .kv-grid, .form-grid { grid-template-columns: 96px minmax(0, 1fr); }
+  .kv.full dd, .ff.full .ff-control { grid-column: 2; }
+}

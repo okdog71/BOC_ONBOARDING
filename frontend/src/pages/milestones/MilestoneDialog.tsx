@@ -449,6 +449,7 @@ export default function MilestonePanel({
       footer={
         editing ? (
           <FootBar
+            key="foot-edit"
             right={
               <>
                 <button
@@ -465,7 +466,7 @@ export default function MilestonePanel({
                 >
                   취소
                 </button>
-                <button type="submit" form="milestone-form" className="primary" disabled={busy}>
+                <button key="btn-save" type="submit" form="milestone-form" className="primary" disabled={busy}>
                   {creating ? '추가' : '저장'}
                 </button>
               </>
@@ -473,6 +474,7 @@ export default function MilestonePanel({
           />
         ) : (
           <FootBar
+            key="foot-view"
             left={
               <label className="foot-status">
                 상태
@@ -481,10 +483,10 @@ export default function MilestonePanel({
             }
             right={
               <>
-                <button className="danger" onClick={remove} disabled={busy}>
+                <button key="btn-delete" type="button" className="danger" onClick={remove} disabled={busy}>
                   삭제
                 </button>
-                <button className="primary" onClick={() => setEditing(true)} disabled={busy}>
+                <button key="btn-edit" type="button" className="primary" onClick={() => setEditing(true)} disabled={busy}>
                   편집
                 </button>
               </>

@@ -313,12 +313,13 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
       footer={
         editing ? (
           <FootBar
+            key="foot-edit"
             right={
               <>
                 <button type="button" disabled={busy} onClick={cancelEdit}>
                   취소
                 </button>
-                <button type="submit" form="resource-form" className="primary" disabled={busy}>
+                <button key="btn-save" type="submit" form="resource-form" className="primary" disabled={busy}>
                   {creating ? '추가' : '저장'}
                 </button>
               </>
@@ -326,6 +327,7 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
           />
         ) : (
           <FootBar
+            key="foot-view"
             left={
               <label className="foot-status">
                 상태
@@ -334,10 +336,10 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
             }
             right={
               <>
-                <button className="danger" onClick={remove} disabled={busy}>
+                <button key="btn-delete" type="button" className="danger" onClick={remove} disabled={busy}>
                   삭제
                 </button>
-                <button className="primary" onClick={() => setEditing(true)} disabled={busy}>
+                <button key="btn-edit" type="button" className="primary" onClick={() => setEditing(true)} disabled={busy}>
                   편집
                 </button>
               </>
