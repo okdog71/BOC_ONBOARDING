@@ -132,7 +132,8 @@ class OpenApiDocsTest {
         });
         // 수급/접근/인수인계 고도화: 그룹 내 순서 변경(+ 수급·접근은 구분명 일괄 변경)
         expected.addAll(List.of("PUT /api/supply-docs/order", "PATCH /api/supply-docs/groups",
-                "PUT /api/access-items/order", "PATCH /api/access-items/groups",
+                "POST /api/supply-docs/{id}/files", "GET /api/supply-docs/{id}/files/{fileId}",
+                "DELETE /api/supply-docs/{id}/files/{fileId}", "PUT /api/access-items/order", "PATCH /api/access-items/groups",
                 "PUT /api/handover-sessions/order"));
         // 마일스톤 고도화 엔드포인트(단계/담당자/체크리스트)
         expected.addAll(List.of("GET /api/milestones/phases", "PATCH /api/milestones/phases",
@@ -143,7 +144,7 @@ class OpenApiDocsTest {
         operations().forEach(op -> actual.add(op.method() + " " + op.path()));
 
         assertThat(actual).isEqualTo(expected);
-        assertThat(actual).hasSize(90);
+        assertThat(actual).hasSize(93);
     }
 
     @Test

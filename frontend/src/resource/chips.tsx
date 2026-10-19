@@ -38,3 +38,6 @@ export function DateCell({ date, overdue }: { date: string | null; overdue?: boo
 
 /** 값이 없으면 흐리게 "-" */
 export const orDash = (v: string | null | undefined) => (v ? v : <span className="muted">-</span>);
+
+/** YYYY-MM-DD → MM-DD (좁은 칸용). 없으면 '-' */
+export const md = (d: string | null | undefined) => (d ? d.slice(5) : '-');

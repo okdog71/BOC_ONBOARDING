@@ -26,6 +26,7 @@ public record SupplyDocResponse(
         @Schema(description = "지연 여부(필요일 경과 & 미수령)", example = "false") boolean overdue,
         @Schema(description = "데이터 품질 경고(차단하지 않음)", example = "[\"수령했지만 위치가 비어 있습니다.\"]") List<String> warnings,
         @Schema(description = "이 산출물을 선행으로 요구하는 인수인계 세션 코드", example = "[\"W1.1\"]") List<String> requiredBySessions,
+        @Schema(description = "첨부 파일(수령한 실제 파일)") List<SupplyDocFileResponse> files,
         @Schema(description = "비고") String note,
         @Schema(description = "생성 시각") LocalDateTime createdAt,
         @Schema(description = "수정 시각") LocalDateTime updatedAt) {

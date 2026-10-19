@@ -6,6 +6,7 @@ import com.grovesoft.boctracker.common.web.BusinessRuleException;
 import com.grovesoft.boctracker.common.web.ConflictException;
 import com.grovesoft.boctracker.common.web.NotFoundException;
 import com.grovesoft.boctracker.link.LinkService;
+import com.grovesoft.boctracker.supplydoc.dto.SupplyDocFileResponse;
 import com.grovesoft.boctracker.supplydoc.dto.SupplyDocRequest;
 import com.grovesoft.boctracker.supplydoc.dto.SupplyDocResponse;
 import jakarta.persistence.EntityManager;
@@ -29,6 +30,7 @@ public class SupplyDocService {
     private final SupplyDocRepository repository;
     private final SupplyDocMapper mapper;
     private final LinkService linkService;
+    private final SupplyDocFileService fileService;
     private final EntityManager em;
     private final Clock clock;
 
@@ -36,9 +38,11 @@ public class SupplyDocService {
                                           boolean overdueOnly, Pageable pageable) {
         LocalDate today = today();
         Map<Long, List<String>> requiredBy = linkService.sessionCodesBySupplyDoc();
-        return repository.search(blankToNull(supplyStatus), blankToNull(category), blankToNull(owner),
-                        blankToNull(q), overdueOnly, today, pageable)
-                .map(e -> mapper.toResponse(e, today, requiredBy.getOrDefault(e.getId(), List.of())));
+        Page<SupplyDoc> page = repository.search(blankToNull(supplyStatus), blankToNull(category), blankToNull(owner),
+                blankToNull(q), overdueOnly, today, pageable);
+        Map<Long, List<SupplyDocFileResponse>> files = fileService.byDoc(page.getContent().stream().map(SupplyDoc::getId).toList());
+        return page.map(e -> mapper.toResponse(e, today, requiredBy.getOrDefault(e.getId(), List.of()),
+                files.getOrDefault(e.getId(), List.of())));
     }
 
     public SupplyDocResponse get(Long id) {
@@ -93,6 +97,7 @@ public class SupplyDocService {
             throw new ConflictException("인수인계 세션이 선행으로 요구 중이라 삭제할 수 없습니다: " + String.join(", ", sessions));
         }
         String category = entity.getCategory();
+        fileService.deleteAllOf(id);
         repository.delete(entity);
         em.flush();
         ordering().resequence(category);
@@ -114,7 +119,7 @@ public class SupplyDocService {
 
     private SupplyDocResponse toResponse(SupplyDoc e) {
         return mapper.toResponse(e, today(),
-                linkService.sessionCodesBySupplyDoc().getOrDefault(e.getId(), List.of()));
+                linkService.sessionCodesBySupplyDoc().getOrDefault(e.getId(), List.of()), fileService.of(e.getId()));
     }
 
     private LocalDate today() {

@@ -63,6 +63,15 @@ export interface MilestoneInput {
   targetDate: string;
 }
 
+export interface SupplyDocFile {
+  id: number;
+  name: string;
+  contentType: string | null;
+  size: number;
+  downloadUrl: string;
+  uploadedAt: string;
+}
+
 export interface SupplyDoc {
   id: number;
   code: string;
@@ -83,6 +92,7 @@ export interface SupplyDoc {
   overdue: boolean;
   warnings: string[];
   requiredBySessions: string[];
+  files: SupplyDocFile[];
   note: string | null;
 }
 

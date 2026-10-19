@@ -12,6 +12,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @Slf4j
 @RestControllerAdvice
@@ -44,6 +47,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({NotFoundException.class, EntityNotFoundException.class})
     public ResponseEntity<ApiResponse<Void>> handleNotFound(RuntimeException e) {
         return build(HttpStatus.NOT_FOUND, ErrorResponse.of("NOT_FOUND", e.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTooLarge(MaxUploadSizeExceededException e) {
+        return build(HttpStatus.PAYLOAD_TOO_LARGE, ErrorResponse.of("FILE_TOO_LARGE", "파일이 너무 큽니다(최대 50MB)."));
+    }
+
+    @ExceptionHandler({MissingServletRequestPartException.class, MultipartException.class})
+    public ResponseEntity<ApiResponse<Void>> handleMultipart(Exception e) {
+        return build(HttpStatus.BAD_REQUEST, ErrorResponse.of("BAD_REQUEST", "파일 업로드 요청이 올바르지 않습니다(file 파트 필요)."));
     }
 
     @ExceptionHandler(BusinessRuleException.class)

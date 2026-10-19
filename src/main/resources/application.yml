@@ -10,6 +10,15 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 52MB
+
+app:
+  storage:
+    # 수급 산출물 첨부 파일 보관 위치(운영에서는 APP_STORAGE_DIR 로 지정)
+    dir: ${APP_STORAGE_DIR:./data/uploads}
 
 ---
 spring:
@@ -44,3 +53,5 @@ spring:
 app:
   seed:
     enabled: false
+  storage:
+    dir: ${java.io.tmpdir}/boc-tracker-test-uploads

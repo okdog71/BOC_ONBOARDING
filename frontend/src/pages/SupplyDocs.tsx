@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import { useEnums } from '../hooks';
-import { SheetChips } from '../links';
-import { DateCell, ItemChip, orDash } from '../resource/chips';
+import { SheetChips, sheetSymbols } from '../links';
+import { DateCell, ItemChip, md, orDash } from '../resource/chips';
+import FilesSection from '../resource/FilesSection';
+import { KV, KVGrid, Section } from '../ui/detail';
 import ManagedPage from '../resource/ManagedPage';
 import RelatedMilestones from '../resource/RelatedMilestones';
 import type { ResourceConfig } from '../resource/types';
@@ -63,7 +65,16 @@ export default function SupplyDocs() {
             </span>
           ),
         },
-        { header: '위치', className: 'small', render: (r) => orDash(r.location) },
+        {
+          header: '위치 · 첨부',
+          className: 'small',
+          render: (r) => (
+            <>
+              {orDash(r.location)}
+              {r.files.length > 0 && <span className="attach-count" title="첨부 파일">📎 {r.files.length}</span>}
+            </>
+          ),
+        },
         { header: '담당', className: 'nowrap', render: (r) => r.owner ?? <span className="muted">미지정</span> },
         { header: '필요일', className: 'nowrap', render: (r) => <DateCell date={r.targetDate} overdue={r.overdue} /> },
         {
@@ -78,34 +89,44 @@ export default function SupplyDocs() {
         },
       ],
       fields: [
+        { key: 'name', label: '산출물명', kind: 'text', required: true, wide: true },
         { key: 'category', label: '구분', kind: 'text', required: true },
-        { key: 'name', label: '산출물명', kind: 'text', required: true },
-        { key: 'expectedContent', label: '기대 내용', kind: 'textarea' },
-        { key: 'usagePurpose', label: '활용 목적', kind: 'textarea', hint: '⑦⑧⑨ 같은 시트 기호는 링크로 표시됩니다' },
-        { key: 'supplyStatus', label: '수급 상태', kind: 'select', options: statuses, allowEmpty: false, hint: '요청일·수령일은 상태 변경 시 자동 기록' },
-        { key: 'existence', label: '존재 여부', kind: 'select', options: EXISTENCE },
-        { key: 'freshness', label: '최신성', kind: 'select', options: FRESHNESS },
-        { key: 'location', label: '위치', kind: 'text', placeholder: 'Confluence/Git/공유드라이브 경로' },
-        { key: 'owner', label: '담당', kind: 'combo', options: (rows) => [...new Set(rows.map((r) => r.owner).filter((v): v is string => Boolean(v)))] },
-        { key: 'targetDate', label: '필요일', kind: 'date', hint: '이 날까지 수령' },
-        { key: 'note', label: '비고', kind: 'textarea' },
+        { key: 'expectedContent', label: '기대 내용', kind: 'textarea', section: '내용' },
+        { key: 'usagePurpose', label: '활용 목적', kind: 'textarea', section: '내용', hint: '⑦⑧⑨ 같은 시트 기호는 링크로 표시됩니다' },
+        { key: 'supplyStatus', label: '수급 상태', kind: 'select', options: statuses, allowEmpty: false, section: '수급 현황', hint: '요청일·수령일은 상태 변경 시 자동 기록' },
+        { key: 'existence', label: '존재 여부', kind: 'select', options: EXISTENCE, section: '수급 현황' },
+        { key: 'freshness', label: '최신성', kind: 'select', options: FRESHNESS, section: '수급 현황' },
+        { key: 'location', label: '위치', kind: 'text', section: '수급 현황', placeholder: 'Confluence/Git/공유드라이브 경로 (파일을 첨부하면 비워도 됩니다)' },
+        { key: 'owner', label: '담당', kind: 'combo', section: '일정 · 담당', options: (rows) => [...new Set(rows.map((r) => r.owner).filter((v): v is string => Boolean(v)))] },
+        { key: 'targetDate', label: '필요일', kind: 'date', section: '일정 · 담당', hint: '이 날까지 수령' },
+        { key: 'note', label: '비고', kind: 'textarea', section: '메모' },
       ],
-      detail: (r) => (
+      facts: (r) => [
+        { label: '수급 상태', value: r.supplyStatus, tone: r.ready ? 'ok' : r.overdue ? 'danger' : undefined },
+        { label: '필요일', value: r.targetDate ?? '미정', tone: r.overdue ? 'danger' : r.targetDate ? undefined : 'muted' },
+        { label: '요청 → 수령', value: `${md(r.requestedDate)} → ${md(r.receivedDate)}` },
+        { label: '담당', value: r.owner ?? '미지정', tone: r.owner ? undefined : 'warn' },
+        { label: '첨부', value: r.files.length > 0 ? `${r.files.length}개` : '없음', tone: r.files.length > 0 ? 'ok' : 'muted' },
+      ],
+      detail: (r, ctx) => (
         <>
-          <dl className="detail">
-            <dt>일정</dt>
-            <dd>
-              요청 {r.requestedDate ?? '-'} · 수령 {r.receivedDate ?? '-'}
-            </dd>
-            <dt>사용처</dt>
-            <dd>
-              <SheetChips text={r.usagePurpose} />
-              {r.requiredBySessions.length === 0 && <span className="muted">이 산출물을 선행으로 요구하는 인수인계 세션이 없습니다.</span>}
-              {r.requiredBySessions.map((c) => (
-                <ItemChip key={c} peek={{ kind: 'handover', code: c }} label={`인수인계 ${c}`} />
-              ))}
-            </dd>
-          </dl>
+          <Section title="연결">
+            <KVGrid>
+              <KV label="필요 세션 (⑤ 인수인계)" wide>
+                {r.requiredBySessions.length > 0 && (
+                  <>
+                    {r.requiredBySessions.map((c) => (
+                      <ItemChip key={c} peek={{ kind: 'handover', code: c }} label={`인수인계 ${c}`} />
+                    ))}
+                  </>
+                )}
+              </KV>
+              <KV label="활용 목적에 나온 메뉴" wide>
+                {sheetSymbols(r.usagePurpose).length > 0 && <SheetChips text={r.usagePurpose} />}
+              </KV>
+            </KVGrid>
+          </Section>
+          <FilesSection doc={r} onChanged={ctx.reload} />
         </>
       ),
       emptyDraft: (group) => ({

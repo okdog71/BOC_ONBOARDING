@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { useEnums } from '../hooks';
-import { DateCell, ItemChip, orDash } from '../resource/chips';
+import { DateCell, ItemChip, md, orDash } from '../resource/chips';
 import ManagedPage from '../resource/ManagedPage';
 import RelatedMilestones from '../resource/RelatedMilestones';
 import type { ResourceConfig } from '../resource/types';
+import { KV, KVGrid, Section } from '../ui/detail';
 import type { AccessItem } from '../types';
 
 const STATUSES = ['미신청', '신청', '승인', '거부', '보류'];
@@ -72,28 +73,34 @@ export default function AccessItems() {
         },
       ],
       fields: [
+        { key: 'target', label: '대상', kind: 'text', required: true, wide: true },
         { key: 'category', label: '구분', kind: 'text', required: true },
-        { key: 'target', label: '대상', kind: 'text', required: true },
-        { key: 'usage', label: '용도', kind: 'textarea', hint: "'접근 전제'를 적으면 다른 접근의 선행(전제) 항목으로 취급" },
-        { key: 'envScope', label: '환경 범위', kind: 'text', placeholder: 'dev / read 등' },
-        { key: 'procedure', label: '신청 절차', kind: 'textarea' },
-        { key: 'status', label: '상태', kind: 'select', options: statuses, allowEmpty: false },
-        { key: 'requestedDate', label: '신청일', kind: 'date', hint: '비워 두면 상태 변경 시 자동 기록' },
-        { key: 'approvedDate', label: '승인일', kind: 'date', hint: '승인 상태에서만' },
-        { key: 'targetDate', label: '필요일', kind: 'date', hint: '투입 전까지 승인' },
-        { key: 'owner', label: '담당', kind: 'combo', options: (rows) => [...new Set(rows.map((r) => r.owner).filter((v): v is string => Boolean(v)))] },
-        { key: 'note', label: '비고', kind: 'textarea' },
+        { key: 'usage', label: '용도', kind: 'textarea', section: '용도 · 절차', hint: "'접근 전제'를 적으면 다른 접근의 선행(전제) 항목으로 취급" },
+        { key: 'envScope', label: '환경 범위', kind: 'text', section: '용도 · 절차', placeholder: 'dev / read 등' },
+        { key: 'procedure', label: '신청 절차', kind: 'textarea', section: '용도 · 절차' },
+        { key: 'status', label: '상태', kind: 'select', options: statuses, allowEmpty: false, section: '신청 현황' },
+        { key: 'requestedDate', label: '신청일', kind: 'date', section: '신청 현황', hint: '비워 두면 상태 변경 시 자동 기록' },
+        { key: 'approvedDate', label: '승인일', kind: 'date', section: '신청 현황', hint: '승인 상태에서만' },
+        { key: 'targetDate', label: '필요일', kind: 'date', section: '신청 현황', hint: '투입 전까지 승인' },
+        { key: 'owner', label: '담당', kind: 'combo', section: '담당 · 메모', options: (rows) => [...new Set(rows.map((r) => r.owner).filter((v): v is string => Boolean(v)))] },
+        { key: 'note', label: '비고', kind: 'textarea', section: '담당 · 메모' },
+      ],
+      facts: (r) => [
+        { label: '상태', value: r.status, tone: r.ready ? 'ok' : r.overdue ? 'danger' : undefined },
+        { label: '필요일', value: r.targetDate ?? '미정', tone: r.overdue ? 'danger' : r.targetDate ? undefined : 'muted' },
+        { label: '신청 → 승인', value: `${md(r.requestedDate)} → ${md(r.approvedDate)}` },
+        { label: '소요', value: r.leadTimeDays !== null ? `${r.leadTimeDays}일` : '-', tone: r.leadTimeDays === null ? 'muted' : undefined },
+        { label: '담당', value: r.owner ?? '미지정', tone: r.owner ? undefined : 'warn' },
       ],
       detail: (r) => (
-        <dl className="detail">
-          <dt>사용처</dt>
-          <dd>
-            {r.requiredBySessions.length === 0 && <span className="muted">이 접근권한을 선행으로 요구하는 인수인계 세션이 없습니다.</span>}
-            {r.requiredBySessions.map((c) => (
-              <ItemChip key={c} peek={{ kind: 'handover', code: c }} label={`인수인계 ${c}`} />
-            ))}
-          </dd>
-        </dl>
+        <Section title="연결">
+          <KVGrid>
+            <KV label="필요 세션 (⑤ 인수인계)" wide>
+              {r.requiredBySessions.length > 0 &&
+                r.requiredBySessions.map((c) => <ItemChip key={c} peek={{ kind: 'handover', code: c }} label={`인수인계 ${c}`} />)}
+            </KV>
+          </KVGrid>
+        </Section>
       ),
       emptyDraft: (group) => ({
         category: group ?? '',

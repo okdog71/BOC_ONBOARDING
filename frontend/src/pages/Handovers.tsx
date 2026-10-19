@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { api, type Page } from '../api';
 import { useEnums } from '../hooks';
-import { SheetChips } from '../links';
+import { SheetChips, sheetSymbols } from '../links';
 import { DateCell, ItemChip, orDash } from '../resource/chips';
 import ManagedPage from '../resource/ManagedPage';
 import RelatedMilestones from '../resource/RelatedMilestones';
 import type { Draft, ResourceConfig } from '../resource/types';
+import { Banner, KV, KVGrid, Section } from '../ui/detail';
 import type { AccessItem, HandoverSession, Milestone, SupplyDoc } from '../types';
 
 const STATUSES = ['미착수', '예정', '진행중', '완료', '보류'];
@@ -130,20 +131,21 @@ export default function Handovers() {
       ],
       fields: [
         { key: 'week', label: '주차', kind: 'select', options: WEEKS, allowEmpty: false, required: true },
+        { key: 'topic', label: '주제', kind: 'textarea', required: true },
         { key: 'category', label: '구분', kind: 'select', options: CATEGORIES, allowEmpty: false, required: true },
         { key: 'domain', label: '도메인', kind: 'text' },
-        { key: 'topic', label: '주제', kind: 'textarea', required: true },
-        { key: 'ktStage', label: 'KT 단계', kind: 'text', hint: '설명/관찰/병행/독립 (복합: 설명·병행)' },
-        { key: 'method', label: '진행 방식', kind: 'text', placeholder: '세션+실습' },
-        { key: 'output', label: '산출물', kind: 'text' },
-        { key: 'handoverFrom', label: '인계자', kind: 'text' },
-        { key: 'handoverTo', label: '인수자', kind: 'text' },
-        { key: 'status', label: '상태', kind: 'select', options: statuses, allowEmpty: false, hint: '완료일은 완료 전환 시 자동 기록' },
-        { key: 'plannedDate', label: '예정일', kind: 'date' },
+        { key: 'ktStage', label: 'KT 단계', kind: 'text', section: '진행', hint: '설명/관찰/병행/독립 (복합: 설명·병행)' },
+        { key: 'method', label: '진행 방식', kind: 'text', section: '진행', placeholder: '세션+실습' },
+        { key: 'handoverFrom', label: '인계자', kind: 'text', section: '진행' },
+        { key: 'handoverTo', label: '인수자', kind: 'text', section: '진행' },
+        { key: 'output', label: '산출물', kind: 'text', section: '진행', wide: true },
+        { key: 'status', label: '상태', kind: 'select', options: statuses, allowEmpty: false, section: '일정', hint: '완료일은 완료 전환 시 자동 기록' },
+        { key: 'plannedDate', label: '예정일', kind: 'date', section: '일정' },
         {
           key: 'milestoneCode',
           label: '연결 마일스톤',
           kind: 'custom',
+          section: '연결 · 선행',
           hint: '이 세션이 속한 인수인계 마일스톤(⑤)',
           render: (d, set, ctx) => {
             const ms = ((ctx.extra as Extra).milestones ?? []).filter((m) => m.output?.includes('⑤'));
@@ -163,6 +165,7 @@ export default function Handovers() {
           key: 'supplyDocCodes',
           label: '선행 수급 산출물(②)',
           kind: 'custom',
+          section: '연결 · 선행',
           hint: '시작 전에 수령되어 있어야 하는 것',
           render: (d, set, ctx) => (
             <CheckPick
@@ -176,6 +179,7 @@ export default function Handovers() {
           key: 'accessItemCodes',
           label: '선행 접근권한(③)',
           kind: 'custom',
+          section: '연결 · 선행',
           hint: '시작 전에 승인되어 있어야 하는 것',
           render: (d, set, ctx) => (
             <CheckPick
@@ -185,51 +189,54 @@ export default function Handovers() {
             />
           ),
         },
-        { key: 'precondition', label: '선행 조건 메모', kind: 'textarea', hint: "'전 세션 완료'를 적으면 마무리 세션으로 취급" },
-        { key: 'note', label: '비고', kind: 'textarea' },
+        { key: 'precondition', label: '선행 조건 메모', kind: 'textarea', section: '메모', hint: "'전 세션 완료'를 적으면 마무리 세션으로 취급" },
+        { key: 'note', label: '비고', kind: 'textarea', section: '메모' },
       ],
+      facts: (r) => [
+        { label: '상태', value: r.status, tone: r.status === '완료' ? 'ok' : r.overdue ? 'danger' : undefined },
+        { label: '예정일', value: r.plannedDate ?? '미정', tone: r.overdue ? 'danger' : r.plannedDate ? undefined : 'muted' },
+        { label: '완료일', value: r.completedDate ?? '-', tone: r.completedDate ? 'ok' : 'muted' },
+        { label: '인계 → 인수', value: r.handoverFrom || r.handoverTo ? `${r.handoverFrom ?? '?'} → ${r.handoverTo ?? '?'}` : '미지정', tone: r.handoverFrom || r.handoverTo ? undefined : 'warn' },
+        { label: '시작 전 미충족', value: r.blockers.length > 0 ? `${r.blockers.length}건` : '없음', tone: r.blockers.length > 0 ? 'warn' : 'ok' },
+      ],
+      alerts: (r) =>
+        r.blockers.length > 0 ? (
+          <Banner tone="warn" title={`시작 전 미충족 ${r.blockers.length}건`}>
+            <ul>
+              {r.blockers.map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+          </Banner>
+        ) : null,
       detail: (r) => (
         <>
-          {r.blockers.length > 0 && (
-            <div className="blockers">
-              <b>시작 전 미충족 {r.blockers.length}건</b>
-              <ul>
-                {r.blockers.map((b) => (
-                  <li key={b}>{b}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <dl className="detail">
-            <dt>마일스톤</dt>
-            <dd>
-              {r.milestoneCode ? (
-                <ItemChip peek={{ kind: 'milestone', code: r.milestoneCode }} label={`${r.milestoneCode} ${r.milestoneName ?? ''}`} />
-              ) : (
-                <span className="muted">연결 없음</span>
+          <Section title="연결 · 선행">
+            <KVGrid>
+              <KV label="마일스톤" wide>
+                {r.milestoneCode && (
+                  <ItemChip peek={{ kind: 'milestone', code: r.milestoneCode }} label={`${r.milestoneCode} ${r.milestoneName ?? ''}`} />
+                )}
+              </KV>
+              <KV label="선행 수급 (②)" wide>
+                {r.supplyDocs.length > 0 &&
+                  r.supplyDocs.map((d) => (
+                    <ItemChip key={d.code} peek={{ kind: 'supply', code: d.code }} ready={d.ready} label={`${d.code} ${d.name} · ${d.status}`} />
+                  ))}
+              </KV>
+              <KV label="선행 접근 (③)" wide>
+                {r.accessItems.length > 0 &&
+                  r.accessItems.map((a) => (
+                    <ItemChip key={a.code} peek={{ kind: 'access', code: a.code }} ready={a.ready} label={`${a.code} ${a.target} · ${a.status}`} />
+                  ))}
+              </KV>
+              {sheetSymbols(r.precondition).filter((x) => x !== '②' && x !== '③').length > 0 && (
+                <KV label="그 밖의 연결 메뉴" wide>
+                  <SheetChips text={r.precondition} skip={['②', '③']} />
+                </KV>
               )}
-            </dd>
-            <dt>선행 수급(②)</dt>
-            <dd>
-              {r.supplyDocs.length === 0 && <span className="muted">없음</span>}
-              {r.supplyDocs.map((d) => (
-                <ItemChip key={d.code} peek={{ kind: 'supply', code: d.code }} ready={d.ready} label={`${d.code} ${d.name} · ${d.status}`} />
-              ))}
-            </dd>
-            <dt>선행 접근(③)</dt>
-            <dd>
-              {r.accessItems.length === 0 && <span className="muted">없음</span>}
-              {r.accessItems.map((a) => (
-                <ItemChip key={a.code} peek={{ kind: 'access', code: a.code }} ready={a.ready} label={`${a.code} ${a.target} · ${a.status}`} />
-              ))}
-            </dd>
-            <dt>선행 메모</dt>
-            <dd>
-              {r.precondition ?? '-'} <SheetChips text={r.precondition} skip={['②', '③']} />
-            </dd>
-            <dt>완료일</dt>
-            <dd>{r.completedDate ?? '-'}</dd>
-          </dl>
+            </KVGrid>
+          </Section>
         </>
       ),
       emptyDraft: (group) => ({

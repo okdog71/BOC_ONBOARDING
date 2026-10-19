@@ -34,6 +34,9 @@ application-*-local.yml
 # ---- Claude Code 로컬 설정 ----
 .claude/settings.local.json
 
+# ---- 업로드 파일(수급 산출물 첨부) ----
+data/
+
 # ---- 로그/덤프 ----
 *.log
 *.hprof

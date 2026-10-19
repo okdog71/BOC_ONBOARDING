@@ -27,7 +27,8 @@ export interface ColumnDef<T extends BaseRow> {
   render: (row: T, ctx: Ctx<T>) => ReactNode;
 }
 
-type FieldBase = { key: string; label: string; required?: boolean; hint?: string; wide?: boolean };
+/** section: 상세·편집 팝업에서 묶을 구역 이름(없으면 '기본'). 구역 순서는 처음 등장한 순서 */
+type FieldBase = { key: string; label: string; required?: boolean; hint?: string; wide?: boolean; section?: string };
 
 export type FieldDef<T extends BaseRow> =
   | (FieldBase & { kind: 'text'; placeholder?: string })
@@ -65,6 +66,10 @@ export interface ResourceConfig<T extends BaseRow> {
   doneLabel: string;
   columns: ColumnDef<T>[];
   fields: FieldDef<T>[];
+  /** 상세 맨 위에 띄울 경고 배너(예: 시작 전 미충족 항목) */
+  alerts?: (row: T) => ReactNode;
+  /** 상세 머리 아래에 한눈에 보여 줄 핵심 수치 */
+  facts?: (row: T) => { label: string; value: ReactNode; tone?: 'ok' | 'warn' | 'danger' | 'muted' }[];
   /** 상세(읽기)에서 필드 아래에 추가로 보여 줄 연결·경고 영역 */
   detail?: (row: T, ctx: Ctx<T>) => ReactNode;
   searchOf: (row: T) => (string | null | undefined)[];
