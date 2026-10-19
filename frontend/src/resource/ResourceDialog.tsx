@@ -292,7 +292,7 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
       eyebrow={config.title}
       code={creating ? undefined : row.code}
       title={title}
-      hue={groupValue ? phaseHue(groupValue) : undefined}
+      hue={groupValue ? (config.groupHue?.(groupValue) ?? phaseHue(groupValue)) : undefined}
       locked={editing}
       mode={editing ? 'edit' : 'view'}
       onClose={onClose}

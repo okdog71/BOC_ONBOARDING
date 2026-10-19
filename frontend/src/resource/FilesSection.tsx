@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { api } from '../api';
-import type { SupplyDoc, SupplyDocFile } from '../types';
+import type { SupplyDocFile } from '../types';
 import { Banner, Section } from '../ui/detail';
 
 export function formatSize(n: number): string {
@@ -12,22 +12,36 @@ export function formatSize(n: number): string {
 const MAX_BYTES = 50 * 1024 * 1024;
 const BLOCKED = ['exe', 'bat', 'cmd', 'com', 'msi', 'scr', 'sh', 'ps1', 'vbs', 'jar', 'dll', 'js'];
 
-/** 첨부 파일 목록(다운로드). readOnly 가 아니면 끌어놓기/선택 업로드와 삭제를 제공한다. */
+/**
+ * 첨부 파일 목록(다운로드). readOnly 가 아니면 끌어놓기/선택 업로드와 삭제를 제공한다.
+ * 수급 산출물·기술부채·인수인계 질의가 함께 쓴다(base 만 다르다).
+ */
 export default function FilesSection({
   doc,
+  base,
+  noun = '항목',
+  title = '첨부 파일',
   readOnly = false,
   onChanged,
+  afterUpload,
 }: {
-  doc: Pick<SupplyDoc, 'id' | 'code' | 'supplyStatus' | 'files'>;
+  doc: { id: number; files: SupplyDocFile[] };
+  /** API 경로, 예: /api/supply-docs */
+  base: string;
+  /** 안내 문구에 쓰는 이름(산출물·항목 …) */
+  noun?: string;
+  title?: string;
   readOnly?: boolean;
   /** 업로드·삭제로 서버 데이터가 바뀜 */
   onChanged: () => void;
+  /** 업로드가 하나 이상 성공한 뒤 호출(예: 수령 처리 제안). 오류 메시지를 던지면 화면에 보인다 */
+  afterUpload?: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState(false);
   const [error, setError] = useState<string>();
   const input = useRef<HTMLInputElement>(null);
-  const base = `/api/supply-docs/${doc.id}/files`;
+  const filesUrl = `${base}/${doc.id}/files`;
 
   async function uploadAll(files: File[]) {
     if (files.length === 0) return;
@@ -41,21 +55,18 @@ export default function FilesSection({
       else if (BLOCKED.includes(ext)) failed.push(`${f.name}: 올릴 수 없는 형식(.${ext})입니다.`);
       else
         try {
-          await api.upload(base, f);
+          await api.upload(filesUrl, f);
           uploaded += 1;
         } catch (e) {
           failed.push(`${f.name}: ${(e as Error).message}`);
         }
     }
     if (failed.length) setError(failed.join('\n'));
-    // 받은 파일이 생겼는데 아직 수령 처리 전이면 상태 변경을 제안한다
-    if (uploaded > 0 && (doc.supplyStatus === '미요청' || doc.supplyStatus === '요청')) {
-      if (window.confirm(`파일을 첨부했습니다. 이 산출물을 "수령"으로 변경할까요?\n(현재: ${doc.supplyStatus})`)) {
-        try {
-          await api.patchStatus(`/api/supply-docs/${doc.id}`, '수령');
-        } catch (e) {
-          setError((e as Error).message);
-        }
+    if (uploaded > 0 && afterUpload) {
+      try {
+        await afterUpload();
+      } catch (e) {
+        setError((e as Error).message);
       }
     }
     setBusy(false);
@@ -68,7 +79,7 @@ export default function FilesSection({
     setBusy(true);
     setError(undefined);
     try {
-      await api.send('DELETE', `${base}/${f.id}`);
+      await api.send('DELETE', `${filesUrl}/${f.id}`);
       onChanged();
     } catch (e) {
       setError((e as Error).message);
@@ -78,7 +89,7 @@ export default function FilesSection({
   }
 
   return (
-    <Section title="첨부 파일" aside={doc.files.length > 0 ? `${doc.files.length}개` : undefined}>
+    <Section title={title} aside={doc.files.length > 0 ? `${doc.files.length}개` : undefined}>
       <div className="files">
         {error && (
           <Banner tone="danger">
@@ -118,7 +129,7 @@ export default function FilesSection({
             }}
           >
             <input ref={input} type="file" multiple disabled={busy} onChange={(e) => void uploadAll([...(e.target.files ?? [])])} />
-            {busy ? '올리는 중…' : '파일을 끌어놓거나 눌러서 선택 (최대 50MB, 산출물당 20개)'}
+            {busy ? '올리는 중…' : `파일을 끌어놓거나 눌러서 선택 (최대 50MB, ${noun}당 20개)`}
           </label>
         )}
         {!readOnly && <p className="muted small">계정·토큰 등 민감정보가 담긴 파일은 올리지 마세요. 실행 파일(.exe 등)은 올릴 수 없습니다.</p>}

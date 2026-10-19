@@ -10,6 +10,12 @@ import com.grovesoft.boctracker.docreliability.DocReliabilityRepository;
 import com.grovesoft.boctracker.docreliability.DocReliabilityService;
 import com.grovesoft.boctracker.docreliability.dto.DocReliabilityRequest;
 import com.grovesoft.boctracker.handover.HandoverSessionRepository;
+import com.grovesoft.boctracker.handoverquestion.HandoverQuestionRepository;
+import com.grovesoft.boctracker.handoverquestion.HandoverQuestionService;
+import com.grovesoft.boctracker.handoverquestion.dto.HandoverQuestionRequest;
+import com.grovesoft.boctracker.techdebt.TechDebtRepository;
+import com.grovesoft.boctracker.techdebt.TechDebtService;
+import com.grovesoft.boctracker.techdebt.dto.TechDebtRequest;
 import com.grovesoft.boctracker.handover.HandoverSessionService;
 import com.grovesoft.boctracker.handover.dto.HandoverSessionRequest;
 import com.grovesoft.boctracker.interfacelink.InterfaceLinkRepository;
@@ -74,6 +80,10 @@ public class SeedTargetRegistry {
     private final RaciAssignmentService raciService;
     private final ReviewLogRepository reviewRepository;
     private final ReviewLogService reviewService;
+    private final TechDebtRepository techDebtRepository;
+    private final TechDebtService techDebtService;
+    private final HandoverQuestionRepository questionRepository;
+    private final HandoverQuestionService questionService;
 
     /** 적재 순서 = 의존 순서: 마일스톤 → 수급/접근 → 인수인계(앞의 셋을 코드로 참조) → 나머지 */
     public List<SeedTarget<?>> targets() {
@@ -101,6 +111,10 @@ public class SeedTargetRegistry {
                 new SeedTarget<>("RaciAssignment", "raci-assignments.json", RaciAssignmentRequest.class,
                         raciRepository::count, raciService::create),
                 new SeedTarget<>("ReviewLog", "review-logs.json", ReviewLogRequest.class,
-                        reviewRepository::count, reviewService::create));
+                        reviewRepository::count, reviewService::create),
+                new SeedTarget<>("TechDebt", "tech-debts.json", TechDebtRequest.class,
+                        techDebtRepository::count, techDebtService::create),
+                new SeedTarget<>("HandoverQuestion", "handover-questions.json", HandoverQuestionRequest.class,
+                        questionRepository::count, questionService::create));
     }
 }

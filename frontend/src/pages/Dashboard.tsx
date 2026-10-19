@@ -14,6 +14,11 @@ const TITLES: Record<string, string> = {
   raci: 'RACI',
   review: '회고',
   analysisCard: '분석 카드',
+  megaProcess: '메가프로세스',
+  interfaceLink: '연동 인터페이스',
+  docReliability: '문서 신뢰도',
+  techDebt: '기술부채',
+  handoverQuestion: '인수인계 질의',
 };
 
 /** 섹션의 total 은 제외하고, 값이 {라벨:건수} 맵인 항목(byStatus, byPriority …)을 그룹으로 반환 */

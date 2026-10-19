@@ -32,6 +32,12 @@ export const NAV: NavItem[] = [
     aliases: ['/handovers'],
     component: lazy(() => import('./pages/Handovers')),
   },
+  {
+    path: '/handover-questions',
+    label: '인수인계 질의',
+    component: lazy(() => import('./pages/HandoverQuestions')),
+  },
+  { path: '/tech-debts', label: '기술부채', component: lazy(() => import('./pages/TechDebts')) },
   { path: '/catchup-actions', label: '캐치업', sheet: '⑥' },
   { path: '/menu-inventories', label: '메뉴 인벤토리', sheet: '⑦' },
   { path: '/mega-processes', label: '메가프로세스', sheet: '⑧' },

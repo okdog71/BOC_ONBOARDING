@@ -5,6 +5,8 @@ import { FilterSelect, State, StatusSelect } from '../components';
 import { useAsync } from '../hooks';
 import { usePeek } from '../peek/context';
 import { phaseHue } from '../phase';
+
+const EXPORT_ICON = '⬇';
 import ResourceDialog from './ResourceDialog';
 import type { BaseRow, Ctx, ResourceConfig } from './types';
 
@@ -45,8 +47,13 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
   const statusOf = (r: T) => String(r[config.statusField]);
 
   // 그룹 순서: 고정 그룹이 있으면 그대로, 없으면 첫 등장(id) 순
+  const hueOf = (g: string) => config.groupHue?.(g) ?? phaseHue(g);
   const groups = useMemo(() => {
-    if (config.fixedGroups) return config.fixedGroups;
+    if (config.fixedGroups) {
+      // 고정 목록에 없는 그룹(예: 이름 변경 전 값)도 잃지 않도록 뒤에 덧붙인다
+      const extra = [...new Set(all.map(groupOf))].filter((g) => !config.fixedGroups!.includes(g));
+      return [...config.fixedGroups, ...extra];
+    }
     const seen: string[] = [];
     all.forEach((r) => {
       if (!seen.includes(groupOf(r))) seen.push(groupOf(r));
@@ -178,6 +185,21 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
     setFilterValues(config.filters.map(() => ''));
   };
 
+  /** 현재 화면의 상태·그룹·검색·필터를 서버 내보내기 파라미터로 옮긴다 */
+  function exportUrl(): string {
+    const p = new URLSearchParams();
+    if (status) p.set('status', status);
+    if (group && config.export) p.set(config.export.groupParam, group);
+    if (q.trim()) p.set('q', q.trim());
+    if (overdueOnly) p.set('overdue', 'true');
+    config.filters.forEach((_, i) => {
+      const name = config.export?.filterParams[i];
+      if (name && filterValues[i]) p.set(name, filterValues[i]);
+    });
+    const qs = p.toString();
+    return `${config.base}/export${qs ? `?${qs}` : ''}`;
+  }
+
   const dragEnabled = !filtering;
   const COLS = 4 + config.columns.length;
   const donePct = all.length ? Math.round((doneCount / all.length) * 100) : 0;
@@ -185,7 +207,7 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
   return (
     <>
       <h2 className="page-title">
-        {config.sheet} {config.title}
+        {[config.sheet, config.title].filter(Boolean).join(' ')}
       </h2>
       {config.header}
 
@@ -198,9 +220,11 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
             {s} {counts[s] ?? 0}
           </button>
         ))}
-        <button className={`chip-stat danger${overdueOnly ? ' active' : ''}`} onClick={() => setOverdueOnly(!overdueOnly)}>
-          지연 {overdueCount}
-        </button>
+        {!config.hideOverdue && (
+          <button className={`chip-stat danger${overdueOnly ? ' active' : ''}`} onClick={() => setOverdueOnly(!overdueOnly)}>
+            지연 {overdueCount}
+          </button>
+        )}
         {warnCount > 0 && (
           <span className="chip-stat warn" title="상세에서 경고 내용을 확인하세요">
             ⚠ 경고 {warnCount}
@@ -222,6 +246,11 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
         ))}
         {filtering && <button onClick={clearFilters}>필터 초기화</button>}
         <span className="spacer" />
+        {config.export && (
+          <a className="btn" href={exportUrl()} download title="현재 필터를 적용해 엑셀(.xlsx)로 내려받습니다">
+            {EXPORT_ICON} 엑셀 내보내기
+          </a>
+        )}
         {filtering && <span className="muted small">필터 적용 중에는 순서를 바꿀 수 없습니다</span>}
         <button className="primary" onClick={() => setParams({ new: '1', ...(group ? { group } : {}) })}>
           + {config.itemLabel} 추가
@@ -245,9 +274,10 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
           <tbody>
             {blocks.map(({ name, rows, total, done }) => (
               <Fragment key={name}>
-                <tr className="phase-row" style={{ '--hue': phaseHue(name) } as React.CSSProperties}>
+                <tr className="phase-row" style={{ '--hue': hueOf(name) } as React.CSSProperties}>
                   <td colSpan={COLS}>
                     <span className="phase-name">{name}</span>
+                    {config.groupHint?.(name) && <span className="phase-hint">{config.groupHint(name)}</span>}
                     <span className="phase-meta">
                       {done}/{total} {config.doneLabel}
                     </span>
@@ -276,7 +306,7 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
                         dragId === r.id ? 'dragging' : '',
                         dropping ? (fromIdx >= 0 && fromIdx < idx ? 'drop-after' : 'drop-before') : '',
                       ].join(' ')}
-                      style={{ '--hue': phaseHue(name) } as React.CSSProperties}
+                      style={{ '--hue': hueOf(name) } as React.CSSProperties}
                       draggable={dragEnabled}
                       onDragStart={(e) => {
                         setDragId(r.id);

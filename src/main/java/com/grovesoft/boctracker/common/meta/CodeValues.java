@@ -45,6 +45,15 @@ public final class CodeValues {
     public static final List<String> ISSUE_TYPE = List.of("이슈", "미확인", "리스크");
     public static final List<String> ISSUE_STATUS = List.of("미착수", "확인중", "진행중", "완료", "보류");
 
+    /** TechDebt.priority — P1 즉시 / P2 단기 / P3 중기 / P4 위생 */
+    public static final List<String> TECH_DEBT_PRIORITY = List.of("P1", "P2", "P3", "P4");
+    public static final List<String> TECH_DEBT_STATUS = List.of("미착수", "확인중", "진행중", "검증중", "완료", "보류");
+    /** TechDebt.system — 코드 접두(KEC-01, BOC-01 …)가 된다 */
+    public static final List<String> TECH_DEBT_SYSTEM = List.of("KEC", "BOC", "공통");
+    /** HandoverQuestion.priority */
+    public static final List<String> QUESTION_PRIORITY = List.of("높음", "중", "낮음");
+    public static final List<String> QUESTION_STATUS = List.of("미확인", "진행중", "확인완료", "보류");
+
     /** GET /api/meta/enums 응답용(그룹명 → 허용값). 선언 순서 유지. */
     public static Map<String, List<String>> all() {
         Map<String, List<String>> m = new LinkedHashMap<>();
@@ -65,6 +74,11 @@ public final class CodeValues {
         m.put("devCheck", DEV_CHECK);
         m.put("issueType", ISSUE_TYPE);
         m.put("issueStatus", ISSUE_STATUS);
+        m.put("techDebtPriority", TECH_DEBT_PRIORITY);
+        m.put("techDebtStatus", TECH_DEBT_STATUS);
+        m.put("techDebtSystem", TECH_DEBT_SYSTEM);
+        m.put("questionPriority", QUESTION_PRIORITY);
+        m.put("questionStatus", QUESTION_STATUS);
         return m;
     }
 }

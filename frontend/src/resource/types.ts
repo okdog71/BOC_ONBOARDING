@@ -47,15 +47,23 @@ export interface ResourceConfig<T extends BaseRow> {
   /** 화면 경로, 예: /supply-docs (딥링크 ?code=) */
   route: string;
   title: string;
-  /** 엑셀 시트 기호(②③⑤) — 연관 마일스톤 조회에 사용 */
+  /** 엑셀 시트 기호(②③⑤) — 연관 마일스톤 조회에 사용. 시트 기호가 없는 메뉴는 빈 문자열 */
   sheet: string;
   itemLabel: string;
   /** 팝업 제목으로 쓸 필드(이름/대상/주제) */
   titleField: string;
   groupField: keyof T & string;
   groupLabel: string;
-  /** 비어 있어도 항상 보여 줄 그룹(예: W1~W4) */
+  /** 비어 있어도 항상 보여 줄 그룹(예: W1~W4). 그룹 표시 순서도 이 순서를 따른다 */
   fixedGroups?: string[];
+  /** 그룹 띠 색(hue 0~360). 없으면 phaseHue 규칙 */
+  groupHue?: (group: string) => number;
+  /** 그룹 이름 옆에 붙일 짧은 설명(예: P1 → 즉시 대응) */
+  groupHint?: (group: string) => string | undefined;
+  /** true 면 '지연' 칩을 숨긴다(기한 개념이 없는 목록) */
+  hideOverdue?: boolean;
+  /** 엑셀 내보내기: 서버 필터 파라미터 이름. filterParams 는 config.filters 와 같은 순서 */
+  export?: { groupParam: string; filterParams: string[] };
   canRenameGroup: boolean;
   statusField: keyof T & string;
   statuses: string[];

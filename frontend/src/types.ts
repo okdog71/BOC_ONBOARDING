@@ -162,3 +162,57 @@ export interface Enums {
 /** /api/summary 의 각 섹션: total + byStatus 등 카운트 맵 */
 export type SummarySection = { total: number } & Record<string, number | Record<string, number>>;
 export type Summary = Record<string, SummarySection>;
+
+/** 기술부채 관리대장 */
+export interface TechDebt {
+  id: number;
+  code: string;
+  no: number;
+  priority: string;
+  system: string;
+  area: string | null;
+  name: string;
+  summary: string | null;
+  impact: string | null;
+  basis: string | null;
+  remedy: string | null;
+  confirmWith: string | null;
+  owner: string | null;
+  status: string;
+  verifyCriteria: string | null;
+  targetDate: string | null;
+  completedDate: string | null;
+  done: boolean;
+  overdue: boolean;
+  warnings: string[];
+  files: SupplyDocFile[];
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 인수인계 질의(질문지) */
+export interface HandoverQuestion {
+  id: number;
+  code: string;
+  no: number;
+  priority: string;
+  kind: string | null;
+  relatedNode: string | null;
+  question: string;
+  basis: string | null;
+  askTo: string | null;
+  hypothesis: string | null;
+  reflectPlan: string | null;
+  status: string;
+  answer: string | null;
+  confirmedBy: string | null;
+  confirmedDate: string | null;
+  done: boolean;
+  overdue: boolean;
+  warnings: string[];
+  files: SupplyDocFile[];
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

@@ -44,12 +44,18 @@ public class OrderingSupport<E extends Sequenced> {
 
     /** {key}.{같은 key 코드의 최대 순번 + 1}. 삭제된 번호는 재사용하지 않는다(최대값 기준). */
     public String nextCode(String key) {
+        return nextCode(key, ".", 0);
+    }
+
+    /** {key}{구분자}{최대 순번 + 1}. width 만큼 0 으로 채운다(예: KEC-01). */
+    public String nextCode(String key, String separator, int width) {
+        String prefix = key + separator;
         List<String> codes = em.createQuery("select e.code from " + entityName + " e where e.code like :p",
-                String.class).setParameter("p", key + ".%").getResultList();
-        int max = codes.stream().map(c -> c.substring(key.length() + 1))
+                String.class).setParameter("p", prefix + "%").getResultList();
+        int max = codes.stream().map(c -> c.substring(prefix.length()))
                 .filter(s -> !s.isEmpty() && s.chars().allMatch(Character::isDigit))
                 .mapToInt(Integer::parseInt).max().orElse(0);
-        return key + "." + (max + 1);
+        return prefix + String.format("%0" + Math.max(width, 1) + "d", max + 1);
     }
 
     /** 그룹 전체 id 를 새 순서로 받아 No. 를 다시 매긴다. 코드는 바뀌지 않는다. */

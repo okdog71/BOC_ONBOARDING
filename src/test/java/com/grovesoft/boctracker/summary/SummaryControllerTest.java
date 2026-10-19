@@ -63,7 +63,12 @@ class SummaryControllerTest {
         JsonNode s = summary();
 
         assertThat(keys(s)).containsExactly("milestone", "handover", "catchup", "supply", "access", "menu",
-                "issue", "raci", "review", "analysisCard", "megaProcess", "interfaceLink", "docReliability");
+                "issue", "raci", "review", "analysisCard", "megaProcess", "interfaceLink", "docReliability", "techDebt",
+                "handoverQuestion");
+        assertThat(keys(s.at("/techDebt/byStatus"))).containsExactlyElementsOf(CodeValues.TECH_DEBT_STATUS);
+        assertThat(keys(s.at("/techDebt/byPriority"))).containsExactlyElementsOf(CodeValues.TECH_DEBT_PRIORITY);
+        assertThat(keys(s.at("/handoverQuestion/byStatus"))).containsExactlyElementsOf(CodeValues.QUESTION_STATUS);
+        assertThat(keys(s.at("/handoverQuestion/byPriority"))).containsExactlyElementsOf(CodeValues.QUESTION_PRIORITY);
         assertThat(keys(s.at("/milestone/byStatus"))).containsExactlyElementsOf(CodeValues.MILESTONE_STATUS);
         assertThat(keys(s.at("/handover/byStatus"))).containsExactlyElementsOf(CodeValues.HANDOVER_STATUS);
         assertThat(keys(s.at("/supply/byStatus"))).containsExactlyElementsOf(CodeValues.SUPPLY_STATUS);
@@ -121,14 +126,14 @@ class SummaryControllerTest {
     }
 
     @Test
-    void 쿼리는_도메인당_1쿼리_menu만_2쿼리_총_14번을_넘지_않는다() throws Exception {
+    void 쿼리는_도메인당_1쿼리_menu만_2쿼리_총_18번을_넘지_않는다() throws Exception {
         Statistics stats = emf.unwrap(SessionFactory.class).getStatistics();
         boolean wasEnabled = stats.isStatisticsEnabled();
         stats.setStatisticsEnabled(true);
         try {
             stats.clear();
             summary();
-            assertThat(stats.getPrepareStatementCount()).isLessThanOrEqualTo(14);
+            assertThat(stats.getPrepareStatementCount()).isLessThanOrEqualTo(18);
         } finally {
             stats.setStatisticsEnabled(wasEnabled);
         }

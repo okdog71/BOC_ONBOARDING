@@ -53,8 +53,8 @@ class SeedDataLoaderStartupTest {
     }
 
     @Test
-    void 기동_시_12개_매핑_모두_seed_건수와_일치하게_적재된다() throws Exception {
-        assertThat(registry.targets()).hasSize(12);
+    void 기동_시_14개_매핑_모두_seed_건수와_일치하게_적재된다() throws Exception {
+        assertThat(registry.targets()).hasSize(14);
         for (SeedTarget<?> t : registry.targets()) {
             assertThat(t.counter().getAsLong()).as(t.domain() + " <- " + t.file()).isEqualTo(jsonSize(t.file()));
         }

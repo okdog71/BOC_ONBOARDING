@@ -354,7 +354,7 @@ export default function PeekDialog({
               )}
             </KVGrid>
           </Section>
-          {kind === 'supply' && files.length > 0 && <FilesSection doc={row as unknown as SupplyDoc} readOnly onChanged={() => undefined} />}
+          {kind === 'supply' && files.length > 0 && <FilesSection doc={row as unknown as SupplyDoc} base="/api/supply-docs" noun="산출물" readOnly onChanged={() => undefined} />}
           <p className="muted small">수정·삭제·순서 변경과 파일 업로드는 해당 화면에서 합니다.</p>
         </>
       )}

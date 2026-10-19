@@ -65,14 +65,14 @@ class OpenApiDocsTest {
     }
 
     @Test
-    void 태그_15개가_중복없이_정의된_순서로_설명과_함께_나온다() throws Exception {
+    void 태그_17개가_중복없이_정의된_순서로_설명과_함께_나온다() throws Exception {
         List<String> names = new ArrayList<>();
         for (JsonNode t : doc().get("tags")) {
             names.add(t.get("name").asText());
             assertThat(t.path("description").asText()).as("설명: " + t.get("name").asText()).isNotBlank();
         }
         assertThat(names).containsExactlyElementsOf(ApiTags.ORDER);
-        assertThat(names).hasSize(15);
+        assertThat(names).hasSize(17);
     }
 
     @Test
@@ -140,11 +140,19 @@ class OpenApiDocsTest {
                 "GET /api/milestones/owners", "PUT /api/milestones/order", "PUT /api/milestones/{id}/check-items",
                 "PATCH /api/milestones/{id}/check-items/{itemId}",
                 "POST /api/milestones/{id}/check-items/generate"));
+        // 기술부채·인수인계 질의: 표준 CRUD + 상태 + 순서 + 그룹명 + 엑셀 내보내기 + 첨부 3종
+        for (String d : List.of("tech-debts", "handover-questions")) {
+            expected.addAll(List.of("GET /api/" + d, "POST /api/" + d, "GET /api/" + d + "/{id}",
+                    "PUT /api/" + d + "/{id}", "DELETE /api/" + d + "/{id}", "PATCH /api/" + d + "/{id}/status",
+                    "PUT /api/" + d + "/order", "PATCH /api/" + d + "/groups", "GET /api/" + d + "/export",
+                    "POST /api/" + d + "/{id}/files", "GET /api/" + d + "/{id}/files/{fileId}",
+                    "DELETE /api/" + d + "/{id}/files/{fileId}"));
+        }
         Set<String> actual = new TreeSet<>();
         operations().forEach(op -> actual.add(op.method() + " " + op.path()));
 
         assertThat(actual).isEqualTo(expected);
-        assertThat(actual).hasSize(93);
+        assertThat(actual).hasSize(117);
     }
 
     @Test

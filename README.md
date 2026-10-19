@@ -104,7 +104,7 @@ $env:DB_PASSWORD = '내_비밀번호'
 
 ## 4. Seed 데이터
 
-`src/main/resources/seed/*.json`(12개)이 기동 시 적재됩니다. 프로젝트 루트의 `seed/`는 원본이며, 실행 시에는 **classpath 사본**을 읽습니다.
+`src/main/resources/seed/*.json`(14개)이 기동 시 적재됩니다. 프로젝트 루트의 `seed/`는 원본이며, 실행 시에는 **classpath 사본**을 읽습니다.
 원본을 수정했다면 `src/main/resources/seed/`로 다시 복사하세요.
 
 | 파일 | 도메인 |
@@ -121,6 +121,8 @@ $env:DB_PASSWORD = '내_비밀번호'
 | `issue-queue.json` | IssueQueue |
 | `raci-assignments.json` | RaciAssignment |
 | `review-logs.json` | ReviewLog (현재 빈 배열 `[]`) |
+| `tech-debts.json` | TechDebt (`DOC/기술부채_관리대장_v0.1.xlsx` 24건) |
+| `handover-questions.json` | HandoverQuestion (`DOC/KRAFTON_BOC_KEC_인수인계_질문지_v1.0.xlsx` 40건, 가설은 `hypothesis` 필드, 확인 대상의 개인 이름은 역할만 남김) |
 
 `AnalysisCard`는 seed 파일이 없습니다.
 
@@ -188,9 +190,9 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 - 목록은 `?page=0&size=20&sort=id,asc` (기본 size 20, 정렬 `id ASC`)이며 `data`는 `{ content, page, size, totalElements, totalPages }`입니다.
 - 상태 변경 `PATCH /{id}/status`의 body는 모두 `{ "status": "<허용값>" }`입니다 (SupplyDoc은 `supplyStatus`, MenuInventory는 `analysisStatus` 필드를 변경).
 - 오류 코드: 검증 실패 `400 VALIDATION_ERROR`, 형식 오류 `400 BAD_REQUEST`, 미존재 `404 NOT_FOUND`, 중복/제약 위반 `409 CONFLICT`, 그 외 `500 INTERNAL_ERROR`.
-- Swagger UI에는 한글 태그 15개(도메인 13 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
+- Swagger UI에는 한글 태그 17개(도메인 15 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
   (목록 200/400 · 단건 200/404 · 생성 201/400/409 · 수정 200/400/404/409 · 상태변경 200/400/404 · 삭제 204/404)가 문서화됩니다.
-  총 93개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
+  총 117개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
 - 도메인 공통 엔드포인트: `GET /api/{resource}` · `GET /{id}` · `POST` · `PUT /{id}` · `DELETE /{id}` (+ status가 있는 도메인은 `PATCH /{id}/status`).
 
 | # | 도메인 | 경로 | 목록 필터 | 필수 필드 | PATCH `/status` |
@@ -247,6 +249,22 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 - 파일이 첨부돼 있으면 "수령했지만 위치가 비어 있습니다" 경고를 내지 않는다. 계정·토큰 등 민감정보가 담긴 파일은 올리지 않는다.
 - 화면: 수급 상세 팝업의 "첨부 파일" 구역(끌어놓기/선택 업로드, 다운로드, 삭제). 미요청/요청 상태에서 올리면 "수령"으로 바꿀지 묻는다.
 
+### 기술부채 `/api/tech-debts` · 인수인계 질의 `/api/handover-questions`
+
+두 엑셀(`DOC/기술부채_관리대장_v0.1.xlsx`, `DOC/KRAFTON_BOC_KEC_인수인계_질문지_v1.0.xlsx`)을 시스템화한 메뉴입니다. 수급·접근권한과 같은 방식(불변 코드 · 우선순위 그룹 내 No. · 드래그 순서 · 팝업 조회/편집)입니다.
+
+| 엔드포인트(두 리소스 공통) | 설명 |
+|---|---|
+| `GET` · `POST` · `GET/PUT/DELETE /{id}` · `PATCH /{id}/status` | 표준 CRUD + 상태 변경 |
+| `PUT /order` · `PATCH /groups` | 우선순위 그룹 내 순서 변경 · 그룹명 일괄 변경(허용된 우선순위로만) |
+| `GET /export` | 목록과 같은 필터를 적용한 엑셀(.xlsx) 내려받기. 원본 양식의 열 순서, 값은 모두 문자열(수식 실행 없음) |
+| `POST` · `GET` · `DELETE /{id}/files[/{fileId}]` | 증빙·근거 파일 첨부(수급 산출물과 같은 규칙, 공용 `attachment` 테이블 · V12) |
+
+- **기술부채**: 코드 `KEC-01`/`BOC-01`/`CMN-01`(시스템 접두 + 순번, 자동 부여·불변). 우선순위 P1~P4 가 그룹, 상태 `미착수·확인중·진행중·검증중·완료·보류`. **완료로 바꾸려면 담당이 필요**(400), 완료일은 서버가 기록, 완료에서 벗어나면 제거. 목표 시점이 지난 미완료(완료·보류 제외)는 `overdue`. 목록 필터: `status, priority, system, owner, q, overdue`. "최종 업데이트"는 `updatedAt`.
+- **인수인계 질의**: 코드 `Q-01`…(자동 부여·불변). 우선순위 높음/중/낮음이 그룹, 상태 `미확인·진행중·확인완료·보류`. **확인완료로 바꾸려면 확인 답변·확인자가 필요**(400), 확인일은 서버가 기록(직접 지정 가능)하고 다른 상태로 되돌리면 제거. 엑셀의 "답변 샘플 [예시·가설]"은 사실이 아니므로 `hypothesis`(가설) 필드로 분리해 화면에 "사실 아님"으로 표기한다. 목록 필터: `status, priority, kind, askTo, q`.
+- 두 메뉴는 기존 메뉴와 확실한 연관이 있는 항목이 없어 링크 필드를 두지 않았다(필요해지면 새 메뉴 → 기존 메뉴 방향으로만 추가).
+- 민감정보(계정·비밀번호·토큰·개인정보)는 입력하지 않는다 — 시드의 개인 이름은 역할로 바꿔 적재했다.
+
 ### ②수급 산출물 · ③접근권한 · ⑤인수인계 (마일스톤과 같은 수준으로 고도화)
 
 | 항목 | 규칙 |
@@ -269,14 +287,15 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 ### 메타: `GET /api/meta/enums`
 
 통제 어휘(드롭다운) 허용값을 `{ 그룹명: [허용값...] }`으로 돌려줍니다. 그룹: `milestoneStatus, handoverStatus, ktStage, week, category,
-catchupTiming, supplyStatus, existence, freshness, accessStatus, grade, codeFit, priority, generation, devCheck, issueType, issueStatus`.
+catchupTiming, supplyStatus, existence, freshness, accessStatus, grade, codeFit, priority, generation, devCheck, issueType, issueStatus,
+techDebtPriority, techDebtStatus, techDebtSystem, questionPriority, questionStatus`.
 `ktStage`는 `설명·병행`처럼 `·`로 이은 복합 표기도 허용됩니다.
 
 ### 요약: `GET /api/summary`
 
 도메인별 `{ total, byStatus }` 구조입니다. 허용 상태값은 0건이어도 코드값 표 순서대로 포함됩니다.
-`menu`는 `byPriority`(상/중/하, priority 미지정 행이 있으면 `미지정`)가 추가되고, 상태가 없는 `megaProcess`/`interfaceLink`/`docReliability`는 `total`만 있습니다.
-도메인당 group-by 1쿼리(menu만 2쿼리), 총 14쿼리로 계산합니다.
+`menu`·`techDebt`·`handoverQuestion`은 `byPriority`(menu 상/중/하, 기술부채 P1~P4, 질의 높음/중/낮음. 미지정 행이 있으면 `미지정`)가 추가되고, 상태가 없는 `megaProcess`/`interfaceLink`/`docReliability`는 `total`만 있습니다.
+도메인당 group-by 1쿼리(menu·techDebt·handoverQuestion은 2쿼리), 총 18쿼리로 계산합니다.
 
 ```json
 {
@@ -313,8 +332,9 @@ com.grovesoft.boctracker
 │                 entity(BaseEntity, StatusCount, GroupCount) · validation(@EnumValue) · meta(CodeValues, /api/meta)
 │                 docs(ApiTags, OpenApiConfig, *Responses 공통 응답코드 애너테이션)
 ├─ milestone/ handover/ catchup/ supplydoc/ access/ docreliability/ menu/
-│  megaprocess/ interfacelink/ analysiscard/ issue/ raci/ review/
+│  megaprocess/ interfacelink/ analysiscard/ issue/ raci/ review/ techdebt/ handoverquestion/
 │                 # 도메인 = Entity · Repository · Service · Mapper(수동) · Controller · dto/(Request, Response, StatusRequest)
+├─ common/attachment, common/export   # 공용 첨부 파일(소유자 유형별) · 의존성 없는 xlsx 작성기
 ├─ summary/       # GET /api/summary
 └─ seed/          # SeedDataLoader · SeedTargetRegistry(파일↔도메인 매핑) · SeedTarget
 ```
@@ -333,7 +353,7 @@ com.grovesoft.boctracker
 
 React 18 + TypeScript + Vite 5. 현재 화면: 대시보드(+링크 점검), 마일스톤, ② 수급 산출물, ③ 접근권한, ⑤ 인수인계(KT).
 항목 단위 링크 칩(세션의 마일스톤·선행 수급/접근, 수급·접근의 필요 세션, 관련 마일스톤)은 페이지를 이동하지 않고 현재 화면 위에 **확인 팝업**(`src/peek/`)을 쌓는다. 팝업은 조회와 **상태 변경**까지만 허용하고(선행 미충족·체크리스트 확인창 동일), 변경하면 뒤쪽 화면이 다시 불러온다. Esc 는 맨 위 팝업만 닫고, "…에서 열기" 로 해당 화면(`?code=`)에 이동할 수 있다. 메뉴 전체를 가리키는 칩(`② 수급 산출물 0/27`)은 이동한다.
-메뉴 구조는 `src/nav.tsx` 레지스트리 한 곳에서 정의한다(라우트·좌측 메뉴·브레드크럼·시트 기호 링크 공용, 엑셀 시트 순서, 화면이 있는 항목만 메뉴에 노출). 새 화면은 `component` 를 채우면 메뉴·라우트·링크 칩이 함께 활성화된다. 레이아웃은 상단 바(브레드크럼) + 좌측 메뉴(900px 이하 드로어), 색·간격은 `styles.css` 의 CSS 변수. 화면 모드는 라이트/다크 2단계 토글(선택 전에는 OS 설정을 따르고, 누르면 선택을 저장). 그룹 띠 색은 마일스톤 단계(P0·HO·P1..)만 고유색이고 수급 구분·인수인계 주차 등은 공통 파랑.
+메뉴 구조는 `src/nav.tsx` 레지스트리 한 곳에서 정의한다(라우트·좌측 메뉴·브레드크럼·시트 기호 링크 공용, 엑셀 시트 순서, 화면이 있는 항목만 메뉴에 노출). 새 화면은 `component` 를 채우면 메뉴·라우트·링크 칩이 함께 활성화된다. 레이아웃은 상단 바(브레드크럼) + 좌측 메뉴(900px 이하 드로어), 색·간격은 `styles.css` 의 CSS 변수. 화면 모드는 라이트/다크 2단계 토글(선택 전에는 OS 설정을 따르고, 누르면 선택을 저장). 그룹 띠 색은 마일스톤 단계(P0·HO·P1..)만 고유색이고 수급 구분·인수인계 주차 등은 공통 파랑. 기술부채·인수인계 질의는 우선순위 색(높을수록 붉게, 낮을수록 푸르게)을 쓴다.
 ②③⑤는 `src/resource/` 의 공통 화면(`ManagedPage`/`ResourceDialog`)을 설정만 달리해 만들며, 다음 도메인도 같은 방식으로 추가한다.
 
 마일스톤 화면: 단계별 색상 그룹 · No./코드 열 · 드래그앤드롭(같은 단계 내, ▲▼ 버튼 병행) 순서 변경 · 상단 요약 칩(상태/지연) · 검색/단계/담당 필터 · 팝업(보기/편집/추가/삭제) ·

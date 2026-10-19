@@ -33,6 +33,17 @@ const P: Record<string, ReactNode> = {
       <path d="M7 7h12l-3-3M17 17H5l3 3" />
     </>
   ),
+  '/handover-questions': (
+    <>
+      <path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+      <path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.6-2.3 1.8-2.3 3M12 14.8h.01" />
+    </>
+  ),
+  '/tech-debts': (
+    <>
+      <path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.6 2.6l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z" />
+    </>
+  ),
 };
 
 const FALLBACK = <circle cx="12" cy="12" r="4" />;

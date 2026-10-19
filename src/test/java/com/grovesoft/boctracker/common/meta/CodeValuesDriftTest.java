@@ -21,6 +21,10 @@ import com.grovesoft.boctracker.raci.dto.RaciAssignmentRequest;
 import com.grovesoft.boctracker.raci.dto.RaciAssignmentStatusRequest;
 import com.grovesoft.boctracker.review.dto.ReviewLogRequest;
 import com.grovesoft.boctracker.review.dto.ReviewLogStatusRequest;
+import com.grovesoft.boctracker.handoverquestion.dto.HandoverQuestionRequest;
+import com.grovesoft.boctracker.handoverquestion.dto.HandoverQuestionStatusRequest;
+import com.grovesoft.boctracker.techdebt.dto.TechDebtRequest;
+import com.grovesoft.boctracker.techdebt.dto.TechDebtStatusRequest;
 import com.grovesoft.boctracker.supplydoc.dto.SupplyDocRequest;
 import com.grovesoft.boctracker.supplydoc.dto.SupplyDocStatusRequest;
 import com.grovesoft.boctracker.milestone.dto.MilestoneRequest;
@@ -106,7 +110,16 @@ class CodeValuesDriftTest {
                 new Binding(AnalysisCardRequest.class, "generation", CodeValues.GENERATION),
                 new Binding(AnalysisCardRequest.class, "devCheck", CodeValues.DEV_CHECK),
                 new Binding(AnalysisCardRequest.class, "status", CodeValues.MILESTONE_STATUS),
-                new Binding(AnalysisCardStatusRequest.class, "status", CodeValues.MILESTONE_STATUS));
+                new Binding(AnalysisCardStatusRequest.class, "status", CodeValues.MILESTONE_STATUS),
+                // TechDebt
+                new Binding(TechDebtRequest.class, "priority", CodeValues.TECH_DEBT_PRIORITY),
+                new Binding(TechDebtRequest.class, "system", CodeValues.TECH_DEBT_SYSTEM),
+                new Binding(TechDebtRequest.class, "status", CodeValues.TECH_DEBT_STATUS),
+                new Binding(TechDebtStatusRequest.class, "status", CodeValues.TECH_DEBT_STATUS),
+                // HandoverQuestion
+                new Binding(HandoverQuestionRequest.class, "priority", CodeValues.QUESTION_PRIORITY),
+                new Binding(HandoverQuestionRequest.class, "status", CodeValues.QUESTION_STATUS),
+                new Binding(HandoverQuestionStatusRequest.class, "status", CodeValues.QUESTION_STATUS));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -167,6 +180,7 @@ class CodeValuesDriftTest {
         assertThat(CodeValues.all().keySet()).containsExactly(
                 "milestoneStatus", "handoverStatus", "ktStage", "week", "category", "catchupTiming",
                 "supplyStatus", "existence", "freshness", "accessStatus", "grade", "codeFit",
-                "priority", "generation", "devCheck", "issueType", "issueStatus");
+                "priority", "generation", "devCheck", "issueType", "issueStatus",
+                "techDebtPriority", "techDebtStatus", "techDebtSystem", "questionPriority", "questionStatus");
     }
 }

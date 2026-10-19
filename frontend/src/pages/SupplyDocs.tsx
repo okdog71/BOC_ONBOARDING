@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { api } from '../api';
 import { useEnums } from '../hooks';
 import { SheetChips, sheetSymbols } from '../links';
 import { DateCell, ItemChip, md, orDash } from '../resource/chips';
@@ -126,7 +127,21 @@ export default function SupplyDocs() {
               </KV>
             </KVGrid>
           </Section>
-          <FilesSection doc={r} onChanged={ctx.reload} />
+          <FilesSection
+            doc={r}
+            base="/api/supply-docs"
+            noun="산출물"
+            onChanged={ctx.reload}
+            afterUpload={async () => {
+              // 받은 파일이 생겼는데 아직 수령 처리 전이면 상태 변경을 제안한다
+              if (r.supplyStatus === '미요청' || r.supplyStatus === '요청') {
+                if (window.confirm(`파일을 첨부했습니다. 이 산출물을 "수령"으로 변경할까요?
+(현재: ${r.supplyStatus})`)) {
+                  await api.patchStatus(`/api/supply-docs/${r.id}`, '수령');
+                }
+              }
+            }}
+          />
         </>
       ),
       emptyDraft: (group) => ({

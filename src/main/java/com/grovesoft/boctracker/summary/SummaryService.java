@@ -8,6 +8,8 @@ import com.grovesoft.boctracker.common.entity.StatusCount;
 import com.grovesoft.boctracker.common.meta.CodeValues;
 import com.grovesoft.boctracker.docreliability.DocReliabilityRepository;
 import com.grovesoft.boctracker.handover.HandoverSessionRepository;
+import com.grovesoft.boctracker.handoverquestion.HandoverQuestionRepository;
+import com.grovesoft.boctracker.techdebt.TechDebtRepository;
 import com.grovesoft.boctracker.interfacelink.InterfaceLinkRepository;
 import com.grovesoft.boctracker.issue.IssueQueueRepository;
 import com.grovesoft.boctracker.megaprocess.MegaProcessRepository;
@@ -26,7 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 도메인당 group-by 1쿼리(status 없는 트래커는 count 1쿼리), menu 만 priority group-by 1쿼리 추가 → 총 14쿼리.
+ * 도메인당 group-by 1쿼리(status 없는 트래커는 count 1쿼리), menu 만 priority group-by 1쿼리 추가 → 총 18쿼리.
  * total 은 status 별 건수의 합으로 계산하므로 별도 count 쿼리가 없다.
  */
 @Service
@@ -49,6 +51,8 @@ public class SummaryService {
     private final MegaProcessRepository megaProcessRepository;
     private final InterfaceLinkRepository interfaceLinkRepository;
     private final DocReliabilityRepository docReliabilityRepository;
+    private final TechDebtRepository techDebtRepository;
+    private final HandoverQuestionRepository questionRepository;
 
     public SummaryResponse summary() {
         return new SummaryResponse(
@@ -64,14 +68,24 @@ public class SummaryService {
                 byStatus(CodeValues.MILESTONE_STATUS, analysisCardRepository.countGroupByStatus()),
                 totalOnly(megaProcessRepository.count()),
                 totalOnly(interfaceLinkRepository.count()),
-                totalOnly(docReliabilityRepository.count()));
+                totalOnly(docReliabilityRepository.count()),
+                withPriority(CodeValues.TECH_DEBT_STATUS, techDebtRepository.countGroupByStatus(),
+                        CodeValues.TECH_DEBT_PRIORITY, techDebtRepository.countGroupByPriority()),
+                withPriority(CodeValues.QUESTION_STATUS, questionRepository.countGroupByStatus(),
+                        CodeValues.QUESTION_PRIORITY, questionRepository.countGroupByPriority()));
     }
 
     private Section menuSection() {
         List<StatusCount> rows = menuRepository.countGroupByStatus();
         long total = rows.stream().mapToLong(StatusCount::getCount).sum();
         return new Section(total, statusMap(CodeValues.MILESTONE_STATUS, rows),
-                priorityMap(menuRepository.countGroupByPriority()));
+                priorityMap(CodeValues.PRIORITY, menuRepository.countGroupByPriority()));
+    }
+
+    private Section withPriority(List<String> statuses, List<StatusCount> statusRows, List<String> priorities,
+                                 List<GroupCount> priorityRows) {
+        long total = statusRows.stream().mapToLong(StatusCount::getCount).sum();
+        return new Section(total, statusMap(statuses, statusRows), priorityMap(priorities, priorityRows));
     }
 
     private Section byStatus(List<String> allowed, List<StatusCount> rows) {
@@ -91,9 +105,9 @@ public class SummaryService {
         return m;
     }
 
-    private Map<String, Long> priorityMap(List<GroupCount> rows) {
+    private Map<String, Long> priorityMap(List<String> allowed, List<GroupCount> rows) {
         Map<String, Long> m = new LinkedHashMap<>();
-        CodeValues.PRIORITY.forEach(p -> m.put(p, 0L));
+        allowed.forEach(p -> m.put(p, 0L));
         long unspecified = 0;
         for (GroupCount r : rows) {
             if (r.getGroupKey() == null || r.getGroupKey().isBlank()) {
