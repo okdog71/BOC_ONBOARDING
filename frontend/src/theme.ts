@@ -1,40 +1,47 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-export type Theme = 'system' | 'light' | 'dark';
+/** 화면 모드는 라이트/다크 두 가지. 선택하기 전에는 OS 설정을 따르고, 한 번 누르면 그 선택을 저장한다. */
+export type Theme = 'light' | 'dark';
 const KEY = 'boc.theme';
-const ORDER: Theme[] = ['system', 'light', 'dark'];
-const LABEL: Record<Theme, string> = { system: '시스템', light: '라이트', dark: '다크' };
-const ICON: Record<Theme, string> = { system: '🖥', light: '☀', dark: '🌙' };
+const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-function read(): Theme {
+function stored(): Theme | null {
   try {
     const v = localStorage.getItem(KEY);
     if (v === 'light' || v === 'dark') return v;
   } catch {
-    /* 저장소 접근 불가 시 시스템 */
+    /* 저장소 접근 불가 시 OS 설정 */
   }
-  return 'system';
+  return null;
 }
 
-function apply(t: Theme) {
-  if (t === 'system') delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme = t;
-  try {
-    if (t === 'system') localStorage.removeItem(KEY);
-    else localStorage.setItem(KEY, t);
-  } catch {
-    /* 무시 */
-  }
+function effective(): Theme {
+  return stored() ?? (window.matchMedia(DARK_QUERY).matches ? 'dark' : 'light');
 }
 
-/** 시스템/라이트/다크 순환 토글. 선택은 localStorage 에 저장되고 index.html 의 인라인 스크립트가 첫 렌더 전에 복원한다. */
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(read);
-  const cycle = useCallback(() => {
-    const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
-    apply(next);
+  const [theme, setTheme] = useState<Theme>(effective);
+
+  // 선택 전에는 OS 설정이 바뀌면 따라간다
+  useEffect(() => {
+    const mq = window.matchMedia(DARK_QUERY);
+    const on = () => {
+      if (stored() === null) setTheme(mq.matches ? 'dark' : 'light');
+    };
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+
+  const toggle = useCallback(() => {
+    const next: Theme = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem(KEY, next);
+    } catch {
+      /* 무시 */
+    }
     setTheme(next);
   }, [theme]);
-  const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
-  return { theme, cycle, label: LABEL[theme], nextLabel: LABEL[next], icon: ICON[theme] };
+
+  return { theme, toggle, nextLabel: theme === 'dark' ? '라이트' : '다크' };
 }

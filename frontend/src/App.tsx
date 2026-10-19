@@ -2,6 +2,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 import PeekHost from './peek/PeekHost';
 import { useTheme } from './theme';
+import { NavIcon, ThemeIcon } from './navIcons';
 import { HOME_PATH, NAV, READY_NAV, findNav } from './nav';
 
 const NARROW = '(max-width: 900px)';
@@ -109,26 +110,33 @@ export default function App() {
           ☰
         </button>
         <Link className="brand" to={HOME_PATH}>
-          BOC 온보딩·인수인계 트래커
+          <span className="brand-mark" aria-hidden="true">B</span>
+          <span className="brand-text">
+            <strong>BOC</strong>
+            <span>온보딩·인수인계 트래커</span>
+          </span>
         </Link>
+        <span className="topbar-sep" aria-hidden="true" />
         <Breadcrumb />
         <button
           type="button"
           className="theme-toggle"
-          onClick={theme.cycle}
-          title="화면 모드 전환: 시스템 → 라이트 → 다크"
-          aria-label={`화면 모드: ${theme.label}. 누르면 ${theme.nextLabel}`}
+          onClick={theme.toggle}
+          title={`${theme.nextLabel} 모드로 전환`}
+          aria-label={`${theme.nextLabel} 모드로 전환`}
         >
-          {theme.icon} {theme.label}
+          <ThemeIcon dark={theme.theme === 'dark'} />
         </button>
       </header>
       <aside id="lnb" className="sidebar" aria-hidden={!open}>
         <nav aria-label="주 메뉴">
+          <p className="nav-title">메뉴</p>
           <ul>
             {READY_NAV.map((n) => (
               <li key={n.path}>
                 <NavLink to={n.path} title={n.sheet ? `${n.sheet} 시트` : undefined} tabIndex={open ? 0 : -1}>
-                  {n.label}
+                  <NavIcon path={n.path} />
+                  <span>{n.label}</span>
                 </NavLink>
               </li>
             ))}

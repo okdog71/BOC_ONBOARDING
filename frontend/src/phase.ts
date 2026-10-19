@@ -7,14 +7,14 @@ export function phaseKey(phase: string): string {
   return m ? m[1].toUpperCase() : 'X';
 }
 
-/** 그룹 띠 색상: 알려진 단계키는 고정색, 나머지는 이름 해시(주차 W1.., 구분명 등) */
+/** 마일스톤 단계가 아닌 그룹(수급 구분 A./B., 인수인계 주차 W1.. 등)의 공통 색 — 인수인계 화면의 파랑 */
+export const GROUP_HUE = 222;
+
+/** 그룹 띠 색상: 알려진 단계키(P0·HO·P1..)는 고정색, 나머지는 모두 공통 파랑 */
 export function phaseHue(phase: string): number {
   const prefixed = /^([A-Za-z][A-Za-z0-9]*)\s*\./.test(phase.trim());
   const key = prefixed ? phaseKey(phase) : phase;
-  if (key in HUES) return HUES[key];
-  let h = 0;
-  for (const c of key) h = (h * 31 + c.charCodeAt(0)) % 360;
-  return h;
+  return key in HUES ? HUES[key] : GROUP_HUE;
 }
 
 /** 새 마일스톤에 부여될 코드 미리보기(서버가 최종 결정): 같은 접두 코드의 최대 순번 + 1 */

@@ -9,6 +9,7 @@
       try {
         var t = localStorage.getItem('boc.theme');
         if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+        else localStorage.removeItem('boc.theme');
       } catch (e) {}
     </script>
   </head>
