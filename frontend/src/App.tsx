@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import PeekHost from './peek/PeekHost';
 import { useTheme } from './theme';
 import { HOME_PATH, NAV, READY_NAV, findNav } from './nav';
 
@@ -91,6 +92,7 @@ export default function App() {
   }, [current]);
 
   return (
+    <PeekHost>
     <div className={`shell${open ? ' nav-open' : ''}`}>
       <a className="skip-link" href="#main">
         본문으로 건너뛰기
@@ -150,5 +152,6 @@ export default function App() {
         </Suspense>
       </main>
     </div>
+    </PeekHost>
   );
 }

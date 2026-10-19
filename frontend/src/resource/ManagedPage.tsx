@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { api, type Page } from '../api';
 import { FilterSelect, State, StatusSelect } from '../components';
 import { useAsync } from '../hooks';
+import { usePeek } from '../peek/context';
 import { phaseHue } from '../phase';
 import ResourceDialog from './ResourceDialog';
 import type { BaseRow, Ctx, ResourceConfig } from './types';
@@ -13,8 +14,9 @@ import type { BaseRow, Ctx, ResourceConfig } from './types';
  * 21~30건 규모라 전체를 한 번에 받아 필터·정렬·그룹을 클라이언트에서 처리한다.
  */
 export default function ManagedPage<T extends BaseRow>({ config }: { config: ResourceConfig<T> }) {
-  const list = useAsync(() => api.get<Page<T>>(`${config.base}?size=500&sort=id,asc`), [config.base]);
-  const extraRes = useAsync(() => (config.loadExtra ? config.loadExtra() : Promise.resolve({})), [config.base]);
+  const { version } = usePeek(); // 확인 팝업에서 상태가 바뀌면 다시 불러온다
+  const list = useAsync(() => api.get<Page<T>>(`${config.base}?size=500&sort=id,asc`), [config.base, version]);
+  const extraRes = useAsync(() => (config.loadExtra ? config.loadExtra() : Promise.resolve({})), [config.base, version]);
   const reload = () => {
     list.reload();
     extraRes.reload();

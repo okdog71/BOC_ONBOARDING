@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { api, type Page } from '../api';
 import { FilterSelect, State, StatusSelect } from '../components';
 import { useAsync, useEnums } from '../hooks';
+import { usePeek } from '../peek/context';
 import { SheetChips } from '../links';
 import { phaseHue } from '../phase';
 import type { Milestone, PhaseInfo } from '../types';
@@ -16,9 +17,10 @@ export default function Milestones() {
   const statuses = enums?.milestoneStatus ?? STATUS_ORDER;
 
   // 21건 규모이므로 전체를 한 번에 받아 필터·정렬·그룹을 클라이언트에서 처리한다(서버 필터는 API 소비자용으로 별도 제공).
-  const list = useAsync(() => api.get<Page<Milestone>>('/api/milestones?size=500&sort=id,asc'), []);
-  const phaseRes = useAsync(() => api.get<PhaseInfo[]>('/api/milestones/phases'), []);
-  const ownerRes = useAsync(() => api.get<string[]>('/api/milestones/owners'), []);
+  const { version } = usePeek(); // 확인 팝업에서 상태가 바뀌면 다시 불러온다
+  const list = useAsync(() => api.get<Page<Milestone>>('/api/milestones?size=500&sort=id,asc'), [version]);
+  const phaseRes = useAsync(() => api.get<PhaseInfo[]>('/api/milestones/phases'), [version]);
+  const ownerRes = useAsync(() => api.get<string[]>('/api/milestones/owners'), [version]);
   const reloadAll = () => {
     list.reload();
     phaseRes.reload();

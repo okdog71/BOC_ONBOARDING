@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useEnums } from '../hooks';
 import { SheetChips } from '../links';
-import { DateCell, ItemChip, itemLink, orDash } from '../resource/chips';
+import { DateCell, ItemChip, orDash } from '../resource/chips';
 import ManagedPage from '../resource/ManagedPage';
 import RelatedMilestones from '../resource/RelatedMilestones';
 import type { ResourceConfig } from '../resource/types';
@@ -73,7 +73,7 @@ export default function SupplyDocs() {
             r.requiredBySessions.length === 0 ? (
               <span className="muted">-</span>
             ) : (
-              r.requiredBySessions.map((c) => <ItemChip key={c} to={itemLink('/handover-sessions', c)} label={c} title="이 산출물을 선행으로 요구하는 인수인계 세션" />)
+              r.requiredBySessions.map((c) => <ItemChip key={c} peek={{ kind: 'handover', code: c }} label={c} title="이 산출물을 선행으로 요구하는 인수인계 세션" />)
             ),
         },
       ],
@@ -102,7 +102,7 @@ export default function SupplyDocs() {
               <SheetChips text={r.usagePurpose} />
               {r.requiredBySessions.length === 0 && <span className="muted">이 산출물을 선행으로 요구하는 인수인계 세션이 없습니다.</span>}
               {r.requiredBySessions.map((c) => (
-                <ItemChip key={c} to={itemLink('/handover-sessions', c)} label={`인수인계 ${c}`} />
+                <ItemChip key={c} peek={{ kind: 'handover', code: c }} label={`인수인계 ${c}`} />
               ))}
             </dd>
           </dl>

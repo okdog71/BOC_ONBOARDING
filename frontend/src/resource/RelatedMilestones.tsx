@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
 import { api, type Page } from '../api';
 import { useAsync } from '../hooks';
+import { usePeek } from '../peek/context';
 import type { Milestone } from '../types';
 
 /**
@@ -8,7 +8,8 @@ import type { Milestone } from '../types';
  * 반대 방향(마일스톤 → 메뉴)은 마일스톤 화면의 산출물/연결 현황 칩이 담당한다.
  */
 export default function RelatedMilestones({ sheet, label }: { sheet: string; label: string }) {
-  const { data } = useAsync(() => api.get<Page<Milestone>>('/api/milestones?size=500&sort=id,asc'), []);
+  const peek = usePeek();
+  const { data } = useAsync(() => api.get<Page<Milestone>>('/api/milestones?size=500&sort=id,asc'), [peek.version]);
   const related = (data?.content ?? []).filter((m) => m.output?.includes(sheet));
   if (!data) return null;
   return (
@@ -18,7 +19,7 @@ export default function RelatedMilestones({ sheet, label }: { sheet: string; lab
       {related.map((m) => {
         const progress = m.links.find((l) => l.sheet === sheet);
         return (
-          <Link key={m.id} className="chip related-chip" to={`/milestones?code=${m.code}`} title={`${m.name} — ${m.status}`}>
+          <button type="button" key={m.id} className="chip related-chip" onClick={() => peek.open('milestone', m.code)} title={`${m.name} — ${m.status} (눌러서 확인)`}>
             <b>{m.code}</b> {m.name}
             <span className={`badge s-${m.status}`}>{m.status}</span>
             {progress && (
@@ -27,7 +28,7 @@ export default function RelatedMilestones({ sheet, label }: { sheet: string; lab
                 {progress.metric} {progress.done}/{progress.total}
               </span>
             )}
-          </Link>
+          </button>
         );
       })}
     </div>

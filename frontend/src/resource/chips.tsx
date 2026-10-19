@@ -1,12 +1,24 @@
-import { Link } from 'react-router-dom';
+import { usePeek, type PeekKind } from '../peek/context';
 
-/** 다른 메뉴의 항목으로 가는 칩. ready=false 면 선행 미충족을 색으로 알린다. */
-export function ItemChip({ to, label, ready, title }: { to: string; label: string; ready?: boolean; title?: string }) {
+/**
+ * 다른 메뉴의 항목을 가리키는 칩. 누르면 페이지 이동 없이 그 항목의 확인 팝업이 현재 화면 위에 열린다.
+ * ready=false 면 선행 미충족을 색으로 알린다.
+ */
+export function ItemChip({ peek, label, ready, title }: { peek: { kind: PeekKind; code: string }; label: string; ready?: boolean; title?: string }) {
+  const { open } = usePeek();
   const cls = ready === undefined ? 'chip' : ready ? 'chip chip-ok' : 'chip chip-wait';
   return (
-    <Link className={cls} to={to} title={title} onClick={(e) => e.stopPropagation()}>
+    <button
+      type="button"
+      className={cls}
+      title={title ? `${title} — 눌러서 확인` : '눌러서 확인'}
+      onClick={(e) => {
+        e.stopPropagation();
+        open(peek.kind, peek.code);
+      }}
+    >
       {label}
-    </Link>
+    </button>
   );
 }
 

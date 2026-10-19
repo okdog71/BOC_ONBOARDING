@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { api, type Page } from '../api';
 import { useEnums } from '../hooks';
 import { SheetChips } from '../links';
-import { DateCell, ItemChip, itemLink, orDash } from '../resource/chips';
+import { DateCell, ItemChip, orDash } from '../resource/chips';
 import ManagedPage from '../resource/ManagedPage';
 import RelatedMilestones from '../resource/RelatedMilestones';
 import type { Draft, ResourceConfig } from '../resource/types';
@@ -103,15 +103,15 @@ export default function Handovers() {
           render: (r) => (
             <>
               {r.milestoneCode ? (
-                <ItemChip to={`/milestones?code=${encodeURIComponent(r.milestoneCode)}`} label={r.milestoneCode} title={r.milestoneName ?? ''} />
+                <ItemChip peek={{ kind: 'milestone', code: r.milestoneCode }} label={r.milestoneCode} title={r.milestoneName ?? ''} />
               ) : (
                 <span className="chip chip-wait" title="연결된 마일스톤 없음">마일스톤 없음</span>
               )}
               {r.supplyDocs.map((d) => (
-                <ItemChip key={d.code} to={itemLink('/supply-docs', d.code)} ready={d.ready} label={`② ${d.code}`} title={`${d.name} (${d.status})`} />
+                <ItemChip key={d.code} peek={{ kind: 'supply', code: d.code }} ready={d.ready} label={`② ${d.code}`} title={`${d.name} (${d.status})`} />
               ))}
               {r.accessItems.map((a) => (
-                <ItemChip key={a.code} to={itemLink('/access-items', a.code)} ready={a.ready} label={`③ ${a.code}`} title={`${a.target} (${a.status})`} />
+                <ItemChip key={a.code} peek={{ kind: 'access', code: a.code }} ready={a.ready} label={`③ ${a.code}`} title={`${a.target} (${a.status})`} />
               ))}
               <SheetChips text={r.precondition} skip={['②', '③']} />
             </>
@@ -204,7 +204,7 @@ export default function Handovers() {
             <dt>마일스톤</dt>
             <dd>
               {r.milestoneCode ? (
-                <ItemChip to={`/milestones?code=${encodeURIComponent(r.milestoneCode)}`} label={`${r.milestoneCode} ${r.milestoneName ?? ''}`} />
+                <ItemChip peek={{ kind: 'milestone', code: r.milestoneCode }} label={`${r.milestoneCode} ${r.milestoneName ?? ''}`} />
               ) : (
                 <span className="muted">연결 없음</span>
               )}
@@ -213,14 +213,14 @@ export default function Handovers() {
             <dd>
               {r.supplyDocs.length === 0 && <span className="muted">없음</span>}
               {r.supplyDocs.map((d) => (
-                <ItemChip key={d.code} to={itemLink('/supply-docs', d.code)} ready={d.ready} label={`${d.code} ${d.name} · ${d.status}`} />
+                <ItemChip key={d.code} peek={{ kind: 'supply', code: d.code }} ready={d.ready} label={`${d.code} ${d.name} · ${d.status}`} />
               ))}
             </dd>
             <dt>선행 접근(③)</dt>
             <dd>
               {r.accessItems.length === 0 && <span className="muted">없음</span>}
               {r.accessItems.map((a) => (
-                <ItemChip key={a.code} to={itemLink('/access-items', a.code)} ready={a.ready} label={`${a.code} ${a.target} · ${a.status}`} />
+                <ItemChip key={a.code} peek={{ kind: 'access', code: a.code }} ready={a.ready} label={`${a.code} ${a.target} · ${a.status}`} />
               ))}
             </dd>
             <dt>선행 메모</dt>

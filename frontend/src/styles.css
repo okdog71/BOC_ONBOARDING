@@ -221,3 +221,10 @@ td.no { width: 64px; font-variant-numeric: tabular-nums; }
 .audit-checks .ok { color: var(--ok); }
 .audit-checks .bad, .audit-issues li { color: var(--warn); }
 td.small, .small { font-size: 12px; }
+
+/* ---- 확인 팝업(다른 메뉴 항목을 페이지 이동 없이 보기) ---- */
+.peek-backdrop { z-index: 60; background: rgb(0 0 0 / .35); }
+.modal.peek { width: min(640px, 100%); }
+.peek .tag { margin-left: 8px; }
+.peek-foot { border-top: 1px solid var(--line); padding-top: var(--space-3); margin-top: var(--space-3); }
+button.chip { font-family: inherit; line-height: 1.5; }
