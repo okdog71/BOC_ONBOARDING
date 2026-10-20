@@ -39,6 +39,12 @@ const P: Record<string, ReactNode> = {
       <path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.6-2.3 1.8-2.3 3M12 14.8h.01" />
     </>
   ),
+  '/audit-logs': (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </>
+  ),
   '/users': (
     <>
       <circle cx="9" cy="8" r="3.2" />

@@ -133,7 +133,7 @@ class AuthAuditApiTest {
 
         mvc.perform(delete("/api/interface-links/" + id).session(bobby)).andExpect(status().isNoContent());
         List<Map<String, Object>> log = jdbc.queryForList(
-                "SELECT entity_type, entity_id, action, actor FROM audit_log WHERE entity_id = ?", id);
+                "SELECT entity_type, entity_id, action, actor FROM audit_log WHERE entity_id = ? AND action = 'DELETE'", id);
         assertThat(log).hasSize(1);
         assertThat(log.get(0)).containsEntry("ACTION", "DELETE").containsEntry("ACTOR", "bobby")
                 .containsEntry("ENTITY_TYPE", "InterfaceLink");

@@ -47,6 +47,7 @@ export const NAV: NavItem[] = [
   { path: '/raci-assignments', label: 'RACI', sheet: '⑫' },
   { path: '/review-logs', label: '회고 로그', sheet: '⑬' },
   { path: '/users', label: '사용자 관리', component: lazy(() => import('./pages/Users')) },
+  { path: '/audit-logs', label: '변경 이력', component: lazy(() => import('./pages/AuditLogs')) },
 ];
 
 export const READY_NAV = NAV.filter((n) => n.component);

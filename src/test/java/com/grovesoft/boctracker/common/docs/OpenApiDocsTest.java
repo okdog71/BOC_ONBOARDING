@@ -21,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-/** /v3/api-docs 가 정상이고 태깅 규칙(한글 태그 19개·순서, summary, 공통 응답코드)과 README 엔드포인트 표를 지키는지 검증. */
+/** /v3/api-docs 가 정상이고 태깅 규칙(한글 태그 20개·순서, summary, 공통 응답코드)과 README 엔드포인트 표를 지키는지 검증. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -65,14 +65,14 @@ class OpenApiDocsTest {
     }
 
     @Test
-    void 태그_19개가_중복없이_정의된_순서로_설명과_함께_나온다() throws Exception {
+    void 태그_20개가_중복없이_정의된_순서로_설명과_함께_나온다() throws Exception {
         List<String> names = new ArrayList<>();
         for (JsonNode t : doc().get("tags")) {
             names.add(t.get("name").asText());
             assertThat(t.path("description").asText()).as("설명: " + t.get("name").asText()).isNotBlank();
         }
         assertThat(names).containsExactlyElementsOf(ApiTags.ORDER);
-        assertThat(names).hasSize(19);
+        assertThat(names).hasSize(20);
     }
 
     @Test
@@ -159,11 +159,13 @@ class OpenApiDocsTest {
         expected.addAll(List.of("GET /api/users", "POST /api/users", "GET /api/users/{id}", "PUT /api/users/{id}",
                 "DELETE /api/users/{id}", "POST /api/users/{id}/password-reset", "POST /api/auth/login",
                 "POST /api/auth/logout", "GET /api/auth/me", "PUT /api/auth/password"));
+        // 변경 이력(조회 전용)
+        expected.addAll(List.of("GET /api/audit-logs", "GET /api/audit-logs/domains"));
         Set<String> actual = new TreeSet<>();
         operations().forEach(op -> actual.add(op.method() + " " + op.path()));
 
         assertThat(actual).isEqualTo(expected);
-        assertThat(actual).hasSize(127);
+        assertThat(actual).hasSize(129);
     }
 
     @Test

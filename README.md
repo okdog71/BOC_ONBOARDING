@@ -193,9 +193,9 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 - 목록은 `?page=0&size=20&sort=id,asc` (기본 size 20, 정렬 `id ASC`)이며 `data`는 `{ content, page, size, totalElements, totalPages }`입니다.
 - 상태 변경 `PATCH /{id}/status`의 body는 모두 `{ "status": "<허용값>" }`입니다 (SupplyDoc은 `supplyStatus`, MenuInventory는 `analysisStatus` 필드를 변경).
 - 오류 코드: 검증 실패 `400 VALIDATION_ERROR`, 형식 오류 `400 BAD_REQUEST`, 미존재 `404 NOT_FOUND`, 중복/제약 위반 `409 CONFLICT`, 그 외 `500 INTERNAL_ERROR`.
-- Swagger UI에는 한글 태그 19개(도메인 15 + 사용자 + 인증 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
+- Swagger UI에는 한글 태그 20개(도메인 15 + 사용자 + 인증 + 변경 이력 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
   (목록 200/400 · 단건 200/404 · 생성 201/400/409 · 수정 200/400/404/409 · 상태변경 200/400/404 · 삭제 204/404)가 문서화됩니다.
-  총 127개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
+  총 129개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
 - 도메인 공통 엔드포인트: `GET /api/{resource}` · `GET /{id}` · `POST` · `PUT /{id}` · `DELETE /{id}` (+ status가 있는 도메인은 `PATCH /{id}/status`).
 
 | # | 도메인 | 경로 | 목록 필터 | 필수 필드 | PATCH `/status` |
@@ -265,7 +265,9 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 | `POST /api/users/{id}/password-reset` | 비밀번호를 초기값(로그인 ID)으로 되돌림 |
 
 - **감사 컬럼**: 모든 테이블에 `created_at/created_by/updated_at/updated_by`가 있고 응답에 `createdBy`·`updatedBy`(로그인 ID)가 실립니다. 등록·수정 시 로그인 사용자로 자동 기록되며(시드·시스템 작업은 `system`), 화면 상세 팝업 맨 아래에 이름·일시로 표시됩니다.
-- **삭제 이력**: 삭제는 행이 사라지므로 `audit_log` 테이블에 (엔티티 종류, ID, 삭제자, 시각)을 남깁니다(조회 API 없음, DB에서 확인).
+- **변경 이력(감사 로그)**: 모든 도메인의 등록·수정·삭제를 `audit_log`에 남기고 `GET /api/audit-logs`(필터: domain · actor · action · code · ip · from~to · q, 최신순)와 화면 "변경 이력" 메뉴에서 조회합니다.
+  기록 항목: 누가(로그인 ID·이름) · 언제 · 어디서(접속 IP·요청 `METHOD /path`) · 무엇을(도메인·대상 코드/이름·ID) · 어떻게(작업 + 필드별 전/후 값. 등록은 입력값, 삭제는 삭제 직전 값, 비밀번호는 값 없이 "변경됨"만).
+  HTTP 요청 밖의 변경(기동 시 시드 적재)은 기록하지 않으며, 감사 컬럼만 바뀐 저장은 기록하지 않습니다. 이력은 변경과 같은 트랜잭션에 기록됩니다.
 - 각 화면의 담당자·확인자·인수자 선택 목록은 사용자 관리의 사용자 이름입니다(값은 이름 문자열로 저장).
 
 ### 기술부채 `/api/tech-debts` · 인수인계 질의 `/api/handover-questions`

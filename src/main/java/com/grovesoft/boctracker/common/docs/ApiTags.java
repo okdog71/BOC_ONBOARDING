@@ -25,10 +25,11 @@ public final class ApiTags {
     public static final String HANDOVER_QUESTION = "인수인계 질의";
     public static final String USER = "사용자";
     public static final String AUTH = "인증";
+    public static final String AUDIT_LOG = "변경 이력";
     public static final String META = "메타(코드값)";
     public static final String SUMMARY = "요약(대시보드)";
 
     /** Swagger UI 에 표시할 태그 순서. */
     public static final List<String> ORDER = List.of(MILESTONE, HANDOVER, CATCHUP, SUPPLY_DOC, ACCESS,
-            DOC_RELIABILITY, MENU, MEGA_PROCESS, INTERFACE_LINK, ANALYSIS_CARD, ISSUE, RACI, REVIEW, TECH_DEBT, HANDOVER_QUESTION, USER, AUTH, META, SUMMARY);
+            DOC_RELIABILITY, MENU, MEGA_PROCESS, INTERFACE_LINK, ANALYSIS_CARD, ISSUE, RACI, REVIEW, TECH_DEBT, HANDOVER_QUESTION, USER, AUTH, AUDIT_LOG, META, SUMMARY);
 }
