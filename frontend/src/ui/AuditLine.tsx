@@ -30,3 +30,15 @@ export default function AuditLine({ row }: { row: AuditFields }) {
     </dl>
   );
 }
+
+/** 목록의 "수정자 · 수정일시" 칸(최초 등록 직후에는 등록자·등록일시와 같다) */
+export function ModifiedCell({ row }: { row: AuditFields }) {
+  const users = useUsers();
+  if (!row.updatedAt) return <span className="muted">-</span>;
+  return (
+    <>
+      <div>{displayName(users, row.updatedBy)}</div>
+      <div className="sub">{when(row.updatedAt)}</div>
+    </>
+  );
+}

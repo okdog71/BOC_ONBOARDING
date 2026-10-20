@@ -7,10 +7,11 @@ import { usePeek } from '../peek/context';
 import { SheetChips } from '../links';
 import { phaseHue } from '../phase';
 import type { Milestone, PhaseInfo } from '../types';
+import { ModifiedCell } from '../ui/AuditLine';
 import MilestoneDialog from './milestones/MilestoneDialog';
 
 const STATUS_ORDER = ['미착수', '진행중', '완료', '보류'];
-const COLS = 10;
+const COLS = 11;
 
 export default function Milestones() {
   const enums = useEnums();
@@ -223,6 +224,7 @@ export default function Milestones() {
               <th>목표일</th>
               <th>진척</th>
               <th>상태</th>
+              <th>수정자 · 수정일시</th>
             </tr>
           </thead>
           <tbody>
@@ -349,6 +351,9 @@ export default function Milestones() {
                           disabled={busyId === m.id}
                           onChange={(v) => changeStatus(m, v)}
                         />
+                      </td>
+                      <td className="nowrap small">
+                        <ModifiedCell row={m} />
                       </td>
                     </tr>
                   );

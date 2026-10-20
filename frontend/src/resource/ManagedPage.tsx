@@ -8,6 +8,7 @@ import { phaseHue } from '../phase';
 
 const EXPORT_ICON = '⬇';
 import ResourceDialog from './ResourceDialog';
+import { ModifiedCell } from '../ui/AuditLine';
 import type { BaseRow, Ctx, ResourceConfig } from './types';
 
 /**
@@ -201,7 +202,7 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
   }
 
   const dragEnabled = !filtering;
-  const COLS = 4 + config.columns.length;
+  const COLS = 5 + config.columns.length;
   const donePct = all.length ? Math.round((doneCount / all.length) * 100) : 0;
 
   return (
@@ -269,6 +270,7 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
                 <th key={c.header}>{c.header}</th>
               ))}
               <th>상태</th>
+              <th>수정자 · 수정일시</th>
             </tr>
           </thead>
           <tbody>
@@ -369,6 +371,9 @@ export default function ManagedPage<T extends BaseRow>({ config }: { config: Res
                           disabled={busyId === r.id}
                           onChange={(v) => changeStatus(r, v)}
                         />
+                      </td>
+                      <td className="nowrap small">
+                        <ModifiedCell row={r} />
                       </td>
                     </tr>
                   );
