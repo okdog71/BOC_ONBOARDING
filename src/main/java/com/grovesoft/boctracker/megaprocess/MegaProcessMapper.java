@@ -33,7 +33,7 @@ public class MegaProcessMapper {
                 e.getExternalLink(),
                 e.getOutputData(),
                 e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

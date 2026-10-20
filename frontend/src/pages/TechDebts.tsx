@@ -112,7 +112,7 @@ export default function TechDebts() {
         { key: 'basis', label: '근거 (문서·조항)', kind: 'text', section: '내용', placeholder: '예: KEC 가이드 §5-1' },
         { key: 'remedy', label: '대응(처리) 방안', kind: 'textarea', section: '내용' },
         { key: 'status', label: '상태', kind: 'select', options: statuses, allowEmpty: false, section: '진행', hint: '완료로 바꾸려면 담당이 필요합니다(완료일은 자동 기록)' },
-        { key: 'owner', label: '담당', kind: 'combo', section: '진행', options: (rows) => uniq(rows.map((r) => r.owner)) },
+        { key: 'owner', label: '담당', kind: 'user', section: '진행' },
         { key: 'targetDate', label: '목표 시점', kind: 'date', section: '진행' },
         { key: 'confirmWith', label: '확인 필요처', kind: 'text', section: '확인 · 검증', placeholder: '문의할 대상·창구' },
         { key: 'verifyCriteria', label: '검증 기준 (SOW §11 연계)', kind: 'textarea', section: '확인 · 검증' },

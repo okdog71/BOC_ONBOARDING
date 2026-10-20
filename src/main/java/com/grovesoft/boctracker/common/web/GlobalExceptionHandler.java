@@ -59,6 +59,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, ErrorResponse.of("BAD_REQUEST", "파일 업로드 요청이 올바르지 않습니다(file 파트 필요)."));
     }
 
+    @ExceptionHandler(com.grovesoft.boctracker.auth.AuthException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuth(com.grovesoft.boctracker.auth.AuthException e) {
+        return build(e.getStatus(), ErrorResponse.of(e.getCode(), e.getMessage()));
+    }
+
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessRule(BusinessRuleException e) {
         return build(HttpStatus.BAD_REQUEST, ErrorResponse.of("BUSINESS_RULE", e.getMessage()));

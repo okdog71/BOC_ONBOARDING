@@ -39,7 +39,7 @@ public class RaciAssignmentMapper {
                 e.getStatus(),
                 e.getTargetDate(),
                 e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

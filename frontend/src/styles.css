@@ -434,3 +434,44 @@ a.btn:hover { border-color: var(--accent); color: var(--accent); }
 .ms-table .clip { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 320px; }
 .hypo-label { color: var(--warn); }
 .toolbar select { max-width: 240px; }
+
+/* ---- 로그인 · 사용자 메뉴 · 감사 정보 ---- */
+.boot-msg { padding: var(--space-5); }
+.login-page { min-height: 100vh; display: grid; place-items: center; padding: var(--space-4); background: radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 55%), var(--bg); }
+.login-card { width: min(360px, 100%); display: flex; flex-direction: column; gap: var(--space-4); padding: 28px 26px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-l); box-shadow: 0 10px 34px rgb(15 23 42 / .12); }
+.login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.login-brand > div { display: flex; flex-direction: column; line-height: 1.25; }
+.login-brand strong { font-size: 18px; font-weight: 800; }
+.login-brand span:not(.brand-mark) { font-size: 12px; color: var(--muted); }
+.login-card .brand-mark { width: 36px; height: 36px; font-size: 18px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), hsl(262 65% 58%)); color: #fff; font-weight: 800; }
+.login-field { display: flex; flex-direction: column; gap: 6px; }
+.login-field > span { font-size: 12px; font-weight: 600; color: var(--muted); }
+.login-field input { width: 100%; padding: 10px 12px; font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-s); }
+.login-field input:focus { border-color: var(--accent); box-shadow: var(--focus-ring); outline: none; }
+.login-card button.primary { padding: 10px; font-weight: 600; }
+.login-error { margin: 0; padding: 8px 10px; font-size: 13px; color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, transparent); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); border-radius: var(--radius-s); }
+
+.user-menu { position: relative; }
+.user-btn { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px 0 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--fg); cursor: pointer; font: inherit; }
+.user-btn:hover { border-color: var(--accent); }
+.avatar { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), hsl(262 65% 58%)); color: #fff; font-size: 12px; font-weight: 700; }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+.user-pop { position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-m); box-shadow: 0 10px 28px rgb(15 23 42 / .18); }
+.user-pop-head { display: flex; flex-direction: column; padding: 8px 10px 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.user-pop-head span { font-size: 12px; color: var(--muted); }
+.user-pop button { text-align: left; padding: 8px 10px; border: 0; border-radius: var(--radius-s); background: transparent; color: var(--fg); font: inherit; cursor: pointer; }
+.user-pop button:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.user-pop em { font-style: normal; color: var(--warn); font-size: 12px; }
+@media (max-width: 700px) { .user-name { display: none; } .user-btn { padding-right: 4px; } }
+
+.modal.dlg.narrow { width: min(420px, 100%); }
+.table-scroll { overflow-x: auto; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+button.link { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; }
+button.link:hover { text-decoration: underline; }
+.audit-line { display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 18px 0 0; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 12px; color: var(--muted); }
+.audit-line > div { display: flex; gap: 6px; }
+.audit-line dt { font-weight: 600; }
+.audit-line dd { margin: 0; }

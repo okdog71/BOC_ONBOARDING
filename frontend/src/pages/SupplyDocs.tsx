@@ -98,7 +98,7 @@ export default function SupplyDocs() {
         { key: 'existence', label: '존재 여부', kind: 'select', options: EXISTENCE, section: '수급 현황' },
         { key: 'freshness', label: '최신성', kind: 'select', options: FRESHNESS, section: '수급 현황' },
         { key: 'location', label: '위치', kind: 'text', section: '수급 현황', placeholder: 'Confluence/Git/공유드라이브 경로 (파일을 첨부하면 비워도 됩니다)' },
-        { key: 'owner', label: '담당', kind: 'combo', section: '일정 · 담당', options: (rows) => [...new Set(rows.map((r) => r.owner).filter((v): v is string => Boolean(v)))] },
+        { key: 'owner', label: '담당', kind: 'user', section: '일정 · 담당' },
         { key: 'targetDate', label: '필요일', kind: 'date', section: '일정 · 담당', hint: '이 날까지 수령' },
         { key: 'note', label: '비고', kind: 'textarea', section: '메모' },
       ],

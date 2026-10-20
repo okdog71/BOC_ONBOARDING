@@ -126,6 +126,9 @@ $env:DB_PASSWORD = '내_비밀번호'
 
 `AnalysisCard`는 seed 파일이 없습니다.
 
+**초기 사용자(`users.json`)** — 도메인 시드와 별개로 `UserSeedLoader`가 사용자 테이블이 비어 있을 때 5명을 적재합니다(초기 비밀번호 = 사용자 ID, BCrypt 해시로 저장, 첫 로그인 후 변경 안내).
+저장소에는 업무 정보(소속·이름·투입일·업무 계정)만 두고, **연락처·개인 메일은 저장소 밖** `data/seed-private/users-contact.json`(`{ "loginId": { "phone": "...", "gmail": "..." } }`, `data/`는 git 제외)이 있을 때만 합쳐 넣습니다. 경로는 `app.seed.private-dir`로 바꿀 수 있습니다.
+
 **적재 규칙**
 
 1. **도메인별로** 테이블이 비어 있을 때만(`count()==0`) 적재합니다. 데이터가 하나라도 있으면 그 도메인은 skip → **재기동해도 중복 적재되지 않습니다.**
@@ -190,9 +193,9 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 - 목록은 `?page=0&size=20&sort=id,asc` (기본 size 20, 정렬 `id ASC`)이며 `data`는 `{ content, page, size, totalElements, totalPages }`입니다.
 - 상태 변경 `PATCH /{id}/status`의 body는 모두 `{ "status": "<허용값>" }`입니다 (SupplyDoc은 `supplyStatus`, MenuInventory는 `analysisStatus` 필드를 변경).
 - 오류 코드: 검증 실패 `400 VALIDATION_ERROR`, 형식 오류 `400 BAD_REQUEST`, 미존재 `404 NOT_FOUND`, 중복/제약 위반 `409 CONFLICT`, 그 외 `500 INTERNAL_ERROR`.
-- Swagger UI에는 한글 태그 17개(도메인 15 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
+- Swagger UI에는 한글 태그 19개(도메인 15 + 사용자 + 인증 + 메타 + 요약)가 아래 표 순서대로 표시되고, 엔드포인트마다 공통 응답코드
   (목록 200/400 · 단건 200/404 · 생성 201/400/409 · 수정 200/400/404/409 · 상태변경 200/400/404 · 삭제 204/404)가 문서화됩니다.
-  총 117개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
+  총 127개 엔드포인트이며, `OpenApiDocsTest`가 태그·응답코드·아래 표와의 일치를 검증합니다.
 - 도메인 공통 엔드포인트: `GET /api/{resource}` · `GET /{id}` · `POST` · `PUT /{id}` · `DELETE /{id}` (+ status가 있는 도메인은 `PATCH /{id}/status`).
 
 | # | 도메인 | 경로 | 목록 필터 | 필수 필드 | PATCH `/status` |
@@ -248,6 +251,22 @@ SELECT COUNT(*) FROM milestone;   -- 재기동 전후 동일 (21)
 - 규칙: 파일당 50MB(초과 `413`) · 산출물당 20개 · 빈 파일/실행 파일(`exe bat cmd com msi scr sh ps1 vbs jar dll js`) `400` · 같은 내용(SHA-256) 중복 `409`. 산출물을 삭제하면 첨부도 함께 삭제된다. DB 롤백 시 방금 쓴 파일도 지운다.
 - 파일이 첨부돼 있으면 "수령했지만 위치가 비어 있습니다" 경고를 내지 않는다. 계정·토큰 등 민감정보가 담긴 파일은 올리지 않는다.
 - 화면: 수급 상세 팝업의 "첨부 파일" 구역(끌어놓기/선택 업로드, 다운로드, 삭제). 미요청/요청 상태에서 올리면 "수령"으로 바꿀지 묻는다.
+
+### 인증 · 사용자 · 감사(Audit)
+
+- **로그인 필수**: `/api/auth/login`을 제외한 모든 `/api/**`는 세션 쿠키(HttpOnly, SameSite=Lax, 8시간)가 필요하며 없으면 `401 UNAUTHORIZED`입니다. 같은 ID로 5회 연속 실패하면 1분간 `429 TOO_MANY_ATTEMPTS`. 서버를 재시작하면 세션이 사라져 다시 로그인해야 합니다. (`app.auth.enabled=false`로 끄면 검사 없이 동작하며 감사 값은 `system` — test 프로파일 기본)
+- 메뉴별 권한은 없습니다(로그인한 내부 사용자는 모든 메뉴 사용). 비밀번호는 BCrypt 해시만 저장하고 어떤 응답에도 포함하지 않습니다.
+
+| 엔드포인트 | 설명 |
+|---|---|
+| `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` | 로그인 · 로그아웃 · 내 정보(로그인 확인) |
+| `PUT /api/auth/password` | 내 비밀번호 변경(현재 비밀번호 확인, 6자 이상, ID와 달라야 함) |
+| `GET/POST /api/users` · `GET/PUT/DELETE /api/users/{id}` | 사용자 관리. 목록은 비페이징 전체(담당자 선택 후보로도 사용). ID는 등록 후 변경 불가, 본인·마지막 사용자는 삭제 불가 |
+| `POST /api/users/{id}/password-reset` | 비밀번호를 초기값(로그인 ID)으로 되돌림 |
+
+- **감사 컬럼**: 모든 테이블에 `created_at/created_by/updated_at/updated_by`가 있고 응답에 `createdBy`·`updatedBy`(로그인 ID)가 실립니다. 등록·수정 시 로그인 사용자로 자동 기록되며(시드·시스템 작업은 `system`), 화면 상세 팝업 맨 아래에 이름·일시로 표시됩니다.
+- **삭제 이력**: 삭제는 행이 사라지므로 `audit_log` 테이블에 (엔티티 종류, ID, 삭제자, 시각)을 남깁니다(조회 API 없음, DB에서 확인).
+- 각 화면의 담당자·확인자·인수자 선택 목록은 사용자 관리의 사용자 이름입니다(값은 이름 문자열로 저장).
 
 ### 기술부채 `/api/tech-debts` · 인수인계 질의 `/api/handover-questions`
 

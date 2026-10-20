@@ -97,7 +97,7 @@ export default function HandoverQuestions() {
         { key: 'reflectPlan', label: '구성도 반영 방법', kind: 'textarea', section: '근거 · 가설' },
         { key: 'status', label: '상태', kind: 'select', options: statuses, allowEmpty: false, section: '확인 결과', hint: '확인완료는 확인 답변·확인자가 필요합니다(확인일은 자동 기록)' },
         { key: 'answer', label: '확인 답변', kind: 'textarea', section: '확인 결과', placeholder: '실제로 확인한 내용(가설과 구분)' },
-        { key: 'confirmedBy', label: '확인자', kind: 'text', section: '확인 결과' },
+        { key: 'confirmedBy', label: '확인자', kind: 'user', section: '확인 결과' },
         { key: 'confirmedDate', label: '확인일', kind: 'date', section: '확인 결과', hint: '비워 두면 확인완료 시 오늘로 기록' },
         { key: 'note', label: '비고', kind: 'textarea', section: '메모' },
       ],

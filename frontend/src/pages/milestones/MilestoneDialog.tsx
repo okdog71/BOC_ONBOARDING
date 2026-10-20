@@ -4,6 +4,8 @@ import { LinkChip, SheetChips } from '../../links';
 import { nextCodePreview } from '../../phase';
 import { StatusBadge, StatusSelect } from '../../components';
 import { phaseHue } from '../../phase';
+import AuditLine from '../../ui/AuditLine';
+import { useUsers } from '../../users';
 import { Banner, DialogFrame, Facts, FootBar, FormField, FormGrid, KV, KVGrid, Section } from '../../ui/detail';
 import type { Milestone, MilestoneInput } from '../../types';
 
@@ -48,7 +50,6 @@ interface Props {
   milestone?: Milestone;
   all: Milestone[];
   phases: string[];
-  owners: string[];
   statuses: string[];
   /** 생성 모드 초기 단계 */
   defaultPhase?: string;
@@ -62,7 +63,6 @@ export default function MilestonePanel({
   milestone,
   all,
   phases,
-  owners,
   statuses,
   defaultPhase,
   onClose,
@@ -70,6 +70,7 @@ export default function MilestonePanel({
   onOpenCode,
 }: Props) {
   const creating = !milestone;
+  const userNames = useUsers().map((u) => u.name);
   const [editing, setEditing] = useState(creating);
   const [draft, setDraft] = useState<MilestoneInput>(() => (milestone ? toInput(milestone) : emptyInput(defaultPhase)));
   const [busy, setBusy] = useState(false);
@@ -257,6 +258,7 @@ export default function MilestonePanel({
           </KVGrid>
         </Section>
       )}
+      <AuditLine row={milestone} />
     </>
   );
 
@@ -330,12 +332,13 @@ export default function MilestonePanel({
             </select>
           </FormField>
           <FormField label="담당">
-            <input list="owner-list" value={draft.owner} onChange={(e) => set('owner', e.target.value)} />
-            <datalist id="owner-list">
-              {owners.map((o) => (
-                <option key={o} value={o} />
+            <select value={draft.owner} onChange={(e) => set('owner', e.target.value)}>
+              <option value="">(미지정)</option>
+              {userNames.map((n) => (
+                <option key={n}>{n}</option>
               ))}
-            </datalist>
+              {draft.owner && !userNames.includes(draft.owner) && <option value={draft.owner}>{draft.owner} (사용자 목록에 없음)</option>}
+            </select>
           </FormField>
           <FormField label="목표일">
             <input type="date" value={draft.targetDate} onChange={(e) => set('targetDate', e.target.value)} />

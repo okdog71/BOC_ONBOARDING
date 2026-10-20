@@ -19,5 +19,7 @@ public record IssueQueueResponse(
         @Schema(description = "조치", example = "현업 인터뷰") String action,
         @Schema(description = "비고") String note,
         @Schema(description = "생성 시각", example = "2026-11-02T09:30:00") LocalDateTime createdAt,
-        @Schema(description = "수정 시각", example = "2026-11-02T09:30:00") LocalDateTime updatedAt) {
+        @Schema(description = "수정 시각", example = "2026-11-02T09:30:00") LocalDateTime updatedAt,
+        @Schema(description = "등록자(로그인 ID)", example = "level9") String createdBy,
+        @Schema(description = "수정자(로그인 ID)", example = "level9") String updatedBy) {
 }

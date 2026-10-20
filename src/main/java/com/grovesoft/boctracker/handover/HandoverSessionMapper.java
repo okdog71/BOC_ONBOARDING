@@ -46,7 +46,7 @@ public class HandoverSessionMapper {
                 e.getMilestone() == null ? null : e.getMilestone().getCode(),
                 e.getMilestone() == null ? null : e.getMilestone().getName(),
                 supply, access, e.blockers(allSessions), e.warnings(), e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

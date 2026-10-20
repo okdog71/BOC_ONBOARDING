@@ -33,7 +33,7 @@ public class AccessItemMapper {
                 e.getEnvScope(), e.getProcedure(), e.getStatus(), e.getRequestedDate(), e.getApprovedDate(),
                 e.getTargetDate(), e.leadTimeDays(), e.isReady(), e.isOverdue(today), e.isPrerequisite(),
                 e.warnings(prerequisitesMissing), requiredBy, e.getOwner(), e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

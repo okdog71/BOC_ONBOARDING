@@ -137,7 +137,7 @@ export default function Handovers() {
         { key: 'ktStage', label: 'KT 단계', kind: 'text', section: '진행', hint: '설명/관찰/병행/독립 (복합: 설명·병행)' },
         { key: 'method', label: '진행 방식', kind: 'text', section: '진행', placeholder: '세션+실습' },
         { key: 'handoverFrom', label: '인계자', kind: 'text', section: '진행' },
-        { key: 'handoverTo', label: '인수자', kind: 'text', section: '진행' },
+        { key: 'handoverTo', label: '인수자', kind: 'user', section: '진행' },
         { key: 'output', label: '산출물', kind: 'text', section: '진행', wide: true },
         { key: 'status', label: '상태', kind: 'select', options: statuses, allowEmpty: false, section: '일정', hint: '완료일은 완료 전환 시 자동 기록' },
         { key: 'plannedDate', label: '예정일', kind: 'date', section: '일정' },

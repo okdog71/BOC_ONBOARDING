@@ -33,7 +33,7 @@ public class HandoverQuestionMapper {
                 e.getId(), e.getCode(), e.getSortOrder(), e.getPriority(), e.getKind(), e.getRelatedNode(),
                 e.getQuestion(), e.getBasis(), e.getAskTo(), e.getHypothesis(), e.getReflectPlan(), e.getStatus(),
                 e.getAnswer(), e.getConfirmedBy(), e.getConfirmedDate(), e.isConfirmed(), false, e.warnings(), files,
-                e.getNote(), e.getCreatedAt(), e.getUpdatedAt());
+                e.getNote(), e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

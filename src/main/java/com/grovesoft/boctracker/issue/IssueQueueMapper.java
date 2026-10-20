@@ -37,7 +37,7 @@ public class IssueQueueMapper {
                 e.getTargetDate(),
                 e.getAction(),
                 e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

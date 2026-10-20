@@ -31,7 +31,7 @@ public class InterfaceLinkMapper {
                 e.getData(),
                 e.getDevCheck(),
                 e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

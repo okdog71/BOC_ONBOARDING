@@ -35,7 +35,7 @@ public class TechDebtMapper {
                 e.getId(), e.getCode(), e.getSortOrder(), e.getPriority(), e.getSystem(), e.getArea(), e.getName(),
                 e.getSummary(), e.getImpact(), e.getBasis(), e.getRemedy(), e.getConfirmWith(), e.getOwner(),
                 e.getStatus(), e.getVerifyCriteria(), e.getTargetDate(), e.getCompletedDate(), e.isDone(),
-                e.isOverdue(today), e.warnings(), files, e.getNote(), e.getCreatedAt(), e.getUpdatedAt());
+                e.isOverdue(today), e.warnings(), files, e.getNote(), e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

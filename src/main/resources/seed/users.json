@@ -1,0 +1,42 @@
+[
+  {
+    "loginId": "level9",
+    "affiliation": "grove",
+    "name": "박석준",
+    "joinDate": "2026-09-01",
+    "kraftonAccount": "p.level9@partner.krafton.com",
+    "groveMail": "level9@grovesoft.net"
+  },
+  {
+    "loginId": "js.lim",
+    "affiliation": "grove(NIT)",
+    "name": "임진석",
+    "joinDate": "2026-09-01",
+    "kraftonAccount": "p.js.lim@partner.krafton.com",
+    "groveMail": "js.lim@grovesoft.net"
+  },
+  {
+    "loginId": "taeilkim",
+    "affiliation": "grove(NIT)",
+    "name": "김태일",
+    "joinDate": "2026-09-01",
+    "kraftonAccount": "p.taeilkim@partner.krafton.com",
+    "groveMail": "taeilkim@grovesoft.net"
+  },
+  {
+    "loginId": "gunbin91",
+    "affiliation": "grove",
+    "name": "조건빈",
+    "joinDate": "2026-09-01",
+    "kraftonAccount": "p.gunbin91@partner.krafton.com",
+    "groveMail": "gunbin91@grovesoft.net"
+  },
+  {
+    "loginId": "taekhoon",
+    "affiliation": "grove",
+    "name": "노택훈",
+    "joinDate": "2026-09-01",
+    "kraftonAccount": "p.taekhoon@partner.krafton.com",
+    "groveMail": "taekhoon@grovesoft.net"
+  }
+]

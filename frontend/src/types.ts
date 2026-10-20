@@ -1,5 +1,9 @@
 export interface Milestone {
   id: number;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string | null;
+  updatedBy?: string | null;
   phase: string;
   code: string;
   /** 단계 내 순서(No.) — 코드와 별개, 드래그로 바뀜 */
@@ -215,4 +219,28 @@ export interface HandoverQuestion {
   note: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/** 시스템 사용자(내부 인원). 비밀번호는 서버가 내려주지 않는다 */
+export interface AppUser {
+  id: number;
+  loginId: string;
+  affiliation: string;
+  name: string;
+  joinDate: string | null;
+  leaveDate: string | null;
+  kraftonAccount: string | null;
+  phone: string | null;
+  groveMail: string | null;
+  ip: string | null;
+  gmail: string | null;
+  vpn: string | null;
+  bocAccount: string | null;
+  kecAccount: string | null;
+  aws: string | null;
+  mustChangePassword: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  updatedBy: string | null;
 }

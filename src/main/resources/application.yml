@@ -15,7 +15,20 @@ spring:
       max-file-size: 50MB
       max-request-size: 52MB
 
+server:
+  servlet:
+    session:
+      timeout: 8h
+      cookie:
+        http-only: true
+        same-site: lax
+
 app:
+  auth:
+    # false 면 로그인 검사를 끈다(테스트·점검용). 감사 값은 "system"
+    enabled: true
+    # 사용자 테이블이 비어 있으면 초기 사용자(비밀번호=로그인 ID)를 적재
+    bootstrap-users: true
   storage:
     # 수급 산출물 첨부 파일 보관 위치(운영에서는 APP_STORAGE_DIR 로 지정)
     dir: ${APP_STORAGE_DIR:./data/uploads}
@@ -51,6 +64,9 @@ spring:
     driver-class-name: org.h2.Driver
 
 app:
+  auth:
+    enabled: false
+    bootstrap-users: false
   seed:
     enabled: false
   storage:

@@ -1,6 +1,10 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import { useAuth } from './auth';
+import Login from './pages/Login';
 import PeekHost from './peek/PeekHost';
+import UserMenu from './ui/UserMenu';
+import { invalidateUsers } from './users';
 import { useTheme } from './theme';
 import { NavIcon, ThemeIcon } from './navIcons';
 import { HOME_PATH, NAV, READY_NAV, findNav } from './nav';
@@ -53,7 +57,19 @@ function Breadcrumb() {
   );
 }
 
+/** 로그인하지 않았으면 로그인 화면, 로그인했으면 앱 본체 */
 export default function App() {
+  const { user, loading } = useAuth();
+  // 로그아웃·세션 만료 때 사용자 캐시를 비운다(다른 사람으로 로그인해도 이전 목록이 남지 않게)
+  useEffect(() => {
+    if (!user) invalidateUsers(false);
+  }, [user]);
+  if (loading) return <p className="muted boot-msg" role="status">불러오는 중…</p>;
+  if (!user) return <Login />;
+  return <Shell />;
+}
+
+function Shell() {
   const narrow = useIsNarrow();
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(() => (window.matchMedia(NARROW).matches ? false : readStoredOpen()));
@@ -127,6 +143,7 @@ export default function App() {
         >
           <ThemeIcon dark={theme.theme === 'dark'} />
         </button>
+        <UserMenu />
       </header>
       <aside id="lnb" className="sidebar" aria-hidden={!open}>
         <nav aria-label="주 메뉴">

@@ -21,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-/** /v3/api-docs 가 정상이고 태깅 규칙(한글 태그 15개·순서, summary, 공통 응답코드)과 README 엔드포인트 표를 지키는지 검증. */
+/** /v3/api-docs 가 정상이고 태깅 규칙(한글 태그 19개·순서, summary, 공통 응답코드)과 README 엔드포인트 표를 지키는지 검증. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -65,14 +65,14 @@ class OpenApiDocsTest {
     }
 
     @Test
-    void 태그_17개가_중복없이_정의된_순서로_설명과_함께_나온다() throws Exception {
+    void 태그_19개가_중복없이_정의된_순서로_설명과_함께_나온다() throws Exception {
         List<String> names = new ArrayList<>();
         for (JsonNode t : doc().get("tags")) {
             names.add(t.get("name").asText());
             assertThat(t.path("description").asText()).as("설명: " + t.get("name").asText()).isNotBlank();
         }
         assertThat(names).containsExactlyElementsOf(ApiTags.ORDER);
-        assertThat(names).hasSize(17);
+        assertThat(names).hasSize(19);
     }
 
     @Test
@@ -90,6 +90,13 @@ class OpenApiDocsTest {
             if (op.path().equals("/api/summary") || op.path().equals("/api/summary/links")
                     || op.path().equals("/api/meta/enums")) {
                 assertThat(codes(op)).as(op.path()).containsExactly("200");
+                continue;
+            }
+            // 인증·사용자: 표준 패턴과 다른 엔드포인트(목록은 비페이징, 로그인/로그아웃 등)
+            if (op.path().startsWith("/api/auth") || (op.path().equals("/api/users") && op.method().equals("GET"))
+                    || op.path().endsWith("/password-reset")) {
+                assertThat(codes(op)).as(op.method() + " " + op.path()).isNotEmpty().contains(
+                        op.path().equals("/api/auth/logout") ? codes(op).iterator().next() : "200");
                 continue;
             }
             boolean byId = op.path().contains("{id}");
@@ -148,11 +155,15 @@ class OpenApiDocsTest {
                     "POST /api/" + d + "/{id}/files", "GET /api/" + d + "/{id}/files/{fileId}",
                     "DELETE /api/" + d + "/{id}/files/{fileId}"));
         }
+        // 사용자 관리 + 로그인/로그아웃/내 정보/비밀번호 변경
+        expected.addAll(List.of("GET /api/users", "POST /api/users", "GET /api/users/{id}", "PUT /api/users/{id}",
+                "DELETE /api/users/{id}", "POST /api/users/{id}/password-reset", "POST /api/auth/login",
+                "POST /api/auth/logout", "GET /api/auth/me", "PUT /api/auth/password"));
         Set<String> actual = new TreeSet<>();
         operations().forEach(op -> actual.add(op.method() + " " + op.path()));
 
         assertThat(actual).isEqualTo(expected);
-        assertThat(actual).hasSize(117);
+        assertThat(actual).hasSize(127);
     }
 
     @Test

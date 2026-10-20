@@ -35,7 +35,7 @@ public class DocReliabilityMapper {
                 e.getGap(),
                 e.getOwner(),
                 e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

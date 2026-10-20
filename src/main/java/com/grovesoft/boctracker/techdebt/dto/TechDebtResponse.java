@@ -31,5 +31,7 @@ public record TechDebtResponse(
         @Schema(description = "첨부 파일(근거 자료 등)") List<AttachmentResponse> files,
         @Schema(description = "비고") String note,
         @Schema(description = "생성 시각") LocalDateTime createdAt,
-        @Schema(description = "최종 업데이트 시각") LocalDateTime updatedAt) {
+        @Schema(description = "최종 업데이트 시각") LocalDateTime updatedAt,
+        @Schema(description = "등록자(로그인 ID)", example = "level9") String createdBy,
+        @Schema(description = "수정자(로그인 ID)", example = "level9") String updatedBy) {
 }

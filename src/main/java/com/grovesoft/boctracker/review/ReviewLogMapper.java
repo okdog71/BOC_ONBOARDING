@@ -41,7 +41,7 @@ public class ReviewLogMapper {
                 e.getActionOwner(),
                 e.getTargetDate(),
                 e.getStatus(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

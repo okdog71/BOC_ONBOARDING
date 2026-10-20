@@ -55,7 +55,7 @@ public class AnalysisCardMapper {
                 e.getOwner(),
                 e.getAnalyzedDate(),
                 e.getStatus(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

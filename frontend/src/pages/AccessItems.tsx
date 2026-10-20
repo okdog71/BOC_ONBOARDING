@@ -82,7 +82,7 @@ export default function AccessItems() {
         { key: 'requestedDate', label: '신청일', kind: 'date', section: '신청 현황', hint: '비워 두면 상태 변경 시 자동 기록' },
         { key: 'approvedDate', label: '승인일', kind: 'date', section: '신청 현황', hint: '승인 상태에서만' },
         { key: 'targetDate', label: '필요일', kind: 'date', section: '신청 현황', hint: '투입 전까지 승인' },
-        { key: 'owner', label: '담당', kind: 'combo', section: '담당 · 메모', options: (rows) => [...new Set(rows.map((r) => r.owner).filter((v): v is string => Boolean(v)))] },
+        { key: 'owner', label: '담당', kind: 'user', section: '담당 · 메모' },
         { key: 'note', label: '비고', kind: 'textarea', section: '담당 · 메모' },
       ],
       facts: (r) => [

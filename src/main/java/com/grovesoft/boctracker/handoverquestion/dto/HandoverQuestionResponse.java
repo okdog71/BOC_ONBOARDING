@@ -29,5 +29,7 @@ public record HandoverQuestionResponse(
         @Schema(description = "첨부 파일(답변 증빙 등)") List<AttachmentResponse> files,
         @Schema(description = "비고") String note,
         @Schema(description = "생성 시각") LocalDateTime createdAt,
-        @Schema(description = "수정 시각") LocalDateTime updatedAt) {
+        @Schema(description = "수정 시각") LocalDateTime updatedAt,
+        @Schema(description = "등록자(로그인 ID)", example = "level9") String createdBy,
+        @Schema(description = "수정자(로그인 ID)", example = "level9") String updatedBy) {
 }

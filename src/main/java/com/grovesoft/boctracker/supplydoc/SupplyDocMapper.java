@@ -35,7 +35,7 @@ public class SupplyDocMapper {
                 e.getUsagePurpose(), e.getExistence(), e.getLocation(), e.getFreshness(), e.getOwner(),
                 e.getSupplyStatus(), e.getTargetDate(), e.getRequestedDate(), e.getReceivedDate(),
                 e.isReady(), e.isOverdue(today), e.warnings(files.size()), requiredBy, files, e.getNote(),
-                e.getCreatedAt(), e.getUpdatedAt());
+                e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

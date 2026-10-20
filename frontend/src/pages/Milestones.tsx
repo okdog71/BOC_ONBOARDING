@@ -372,7 +372,6 @@ export default function Milestones() {
           milestone={creating ? undefined : selected}
           all={all}
           phases={phases.map((p) => p.phase)}
-          owners={ownerRes.data ?? []}
           statuses={statuses}
           defaultPhase={newPhase}
           onClose={close}

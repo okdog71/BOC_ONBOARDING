@@ -33,7 +33,9 @@ public record MilestoneResponse(
         @Schema(description = "체크리스트 항목") List<CheckItemResponse> checkItems,
         @Schema(description = "산출물이 가리키는 메뉴(②③⑤)의 실제 진행 현황") List<LinkedProgress> links,
         @Schema(description = "생성 시각", example = "2026-11-02T09:30:00") LocalDateTime createdAt,
-        @Schema(description = "수정 시각", example = "2026-11-02T09:30:00") LocalDateTime updatedAt) {
+        @Schema(description = "수정 시각", example = "2026-11-02T09:30:00") LocalDateTime updatedAt,
+        @Schema(description = "등록자(로그인 ID)", example = "level9") String createdBy,
+        @Schema(description = "수정자(로그인 ID)", example = "level9") String updatedBy) {
 
     @Schema(description = "체크리스트 진척. 항목이 없으면 total=0, percent=null")
     public record Progress(

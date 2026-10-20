@@ -37,6 +37,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
     headers: isForm ? init?.headers : { 'Content-Type': 'application/json', ...init?.headers },
   });
+  if (res.status === 401 && !path.endsWith('/auth/login')) window.dispatchEvent(new Event('boc:unauthorized'));
   if (res.status === 204) return undefined as T;
   let json: ApiResponse<T> | undefined;
   try {

@@ -3,6 +3,10 @@ import type { ReactNode } from 'react';
 /** 서버 응답 공통 필드(코드·No.·지연·경고) */
 export interface BaseRow {
   id: number;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string | null;
+  updatedBy?: string | null;
   code: string;
   no: number;
   overdue: boolean;
@@ -34,6 +38,8 @@ export type FieldDef<T extends BaseRow> =
   | (FieldBase & { kind: 'text'; placeholder?: string })
   | (FieldBase & { kind: 'textarea'; placeholder?: string })
   | (FieldBase & { kind: 'date' })
+  /** 사용자 관리에 등록된 사람 중 선택(담당자·확인자 등). 값은 사용자 이름 */
+  | (FieldBase & { kind: 'user' })
   /** 고정 목록 중 선택(빈 값 허용) */
   | (FieldBase & { kind: 'select'; options: string[]; allowEmpty?: boolean })
   /** 기존 값 목록에서 고르거나 직접 입력 */

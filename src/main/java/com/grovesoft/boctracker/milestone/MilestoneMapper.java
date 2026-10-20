@@ -43,7 +43,7 @@ public class MilestoneMapper {
                 e.getDoneCriteria(), e.getNote(), e.getTargetDate(), e.getCompletedDate(), e.isOverdue(today),
                 e.getPredecessors().stream().map(Milestone::getCode).sorted().toList(),
                 e.incompletePredecessors().stream().map(Milestone::getCode).sorted().toList(),
-                progress, items, links, e.getCreatedAt(), e.getUpdatedAt());
+                progress, items, links, e.getCreatedAt(), e.getUpdatedAt(), e.getCreatedBy(), e.getUpdatedBy());
     }
 
     private String blankToNull(String s) {

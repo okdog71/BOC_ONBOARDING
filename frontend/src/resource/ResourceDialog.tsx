@@ -2,6 +2,8 @@ import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from '../api';
 import { StatusBadge, StatusSelect } from '../components';
 import { phaseHue } from '../phase';
+import AuditLine from '../ui/AuditLine';
+import { useUsers } from '../users';
 import { Banner, DialogFrame, Facts, FootBar, FormField, FormGrid, KV, KVGrid, Section } from '../ui/detail';
 import type { BaseRow, Ctx, Draft, FieldDef, ResourceConfig } from './types';
 
@@ -48,6 +50,7 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
   const [draft, setDraft] = useState<Draft>(() => (row ? config.toDraft(row) : config.emptyDraft(defaultGroup)));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
+  const userNames = useUsers().map((u) => u.name);
 
   // 저장 후 서버 값이 갱신되면 초안을 맞춘다(편집 중에는 덮어쓰지 않는다).
   useEffect(() => {
@@ -172,6 +175,7 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
         );
       })}
       {config.detail?.(row, ctx)}
+      <AuditLine row={row} />
     </>
   );
 
@@ -201,6 +205,18 @@ export default function ResourceDialog<T extends BaseRow>({ config, row, ctx, gr
               {f.options.map((o) => (
                 <option key={o}>{o}</option>
               ))}
+            </select>
+          </FormField>
+        );
+      case 'user':
+        return (
+          <FormField {...common}>
+            <select value={value} onChange={(e) => set(f.key, e.target.value)}>
+              <option value="">(미지정)</option>
+              {userNames.map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+              {value && !userNames.includes(value) && <option value={value}>{value} (사용자 목록에 없음)</option>}
             </select>
           </FormField>
         );
