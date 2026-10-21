@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from './auth';
 import Login from './pages/Login';
@@ -8,6 +8,11 @@ import { invalidateUsers } from './users';
 import { useTheme } from './theme';
 import { NavIcon, ThemeIcon } from './navIcons';
 import { HOME_PATH, NAV, READY_NAV, findNav } from './nav';
+
+// 이용자(대고객)용 확률 정보 화면 - 로그인 없이 열리는 공개 화면이라 인증 게이트·관리 셸 밖에서 렌더한다.
+// 관리 메뉴(nav.tsx)에는 넣지 않고, 상단바의 "확률형아이템" 링크(새 탭)로만 연결한다.
+const PUBLIC_PROBABILITY_PATH = '/probability';
+const ProbabilityPage = lazy(() => import('./site/probability/ProbabilityPage'));
 
 const NARROW = '(max-width: 900px)';
 const STORAGE_KEY = 'boc.nav.open';
@@ -60,10 +65,18 @@ function Breadcrumb() {
 /** 로그인하지 않았으면 로그인 화면, 로그인했으면 앱 본체 */
 export default function App() {
   const { user, loading } = useAuth();
+  const { pathname } = useLocation();
   // 로그아웃·세션 만료 때 사용자 캐시를 비운다(다른 사람으로 로그인해도 이전 목록이 남지 않게)
   useEffect(() => {
     if (!user) invalidateUsers(false);
   }, [user]);
+  if (pathname === PUBLIC_PROBABILITY_PATH || pathname.startsWith(`${PUBLIC_PROBABILITY_PATH}/`)) {
+    return (
+      <Suspense fallback={<p className="muted boot-msg" role="status">불러오는 중…</p>}>
+        <ProbabilityPage />
+      </Suspense>
+    );
+  }
   if (loading) return <p className="muted boot-msg" role="status">불러오는 중…</p>;
   if (!user) return <Login />;
   return <Shell />;
@@ -134,6 +147,15 @@ function Shell() {
         </Link>
         <span className="topbar-sep" aria-hidden="true" />
         <Breadcrumb />
+        <a
+          className="topbar-link"
+          href={PUBLIC_PROBABILITY_PATH}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="이용자용 확률 정보 화면 (새 탭)"
+        >
+          확률형아이템
+        </a>
         <button
           type="button"
           className="theme-toggle"
