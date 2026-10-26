@@ -5,10 +5,11 @@ import { State } from '../components';
 import { useAsync } from '../hooks';
 import type { AppUser } from '../types';
 import AuditLine from '../ui/AuditLine';
+import CopyText from '../ui/CopyText';
 import { Banner, DialogFrame, FootBar, FormField, FormGrid, KV, KVGrid, Section } from '../ui/detail';
 import { invalidateUsers } from '../users';
 
-type Field = { key: keyof AppUser & string; label: string; kind?: 'date'; required?: boolean; section: string; hint?: string };
+type Field = { key: keyof AppUser & string; label: string; kind?: 'date'; required?: boolean; section: string; hint?: string; copy?: boolean };
 
 const FIELDS: Field[] = [
   { key: 'loginId', label: '사용자 ID', required: true, section: '기본', hint: '등록 후 변경할 수 없습니다. 초기 비밀번호는 ID 와 같습니다' },
@@ -16,14 +17,14 @@ const FIELDS: Field[] = [
   { key: 'affiliation', label: '소속', required: true, section: '기본' },
   { key: 'joinDate', label: '투입일', kind: 'date', section: '기본' },
   { key: 'leaveDate', label: '철수일', kind: 'date', section: '기본' },
-  { key: 'kraftonAccount', label: '크래프톤 계정', section: '연락처' },
+  { key: 'kraftonAccount', label: '크래프톤 계정', section: '연락처', copy: true },
   { key: 'phone', label: '연락처', section: '연락처' },
-  { key: 'groveMail', label: 'Grove 메일', section: '연락처' },
-  { key: 'gmail', label: 'G메일', section: '연락처' },
+  { key: 'groveMail', label: 'Grove 메일', section: '연락처', copy: true },
+  { key: 'gmail', label: 'G메일', section: '연락처', copy: true },
   { key: 'ip', label: 'IP', section: '접속 계정' },
   { key: 'vpn', label: 'VPN', section: '접속 계정' },
-  { key: 'bocAccount', label: 'BOC 계정', section: '접속 계정' },
-  { key: 'kecAccount', label: 'KEC 계정', section: '접속 계정' },
+  { key: 'bocAccount', label: 'BOC 계정', section: '접속 계정', copy: true },
+  { key: 'kecAccount', label: 'KEC 계정', section: '접속 계정', copy: true },
   { key: 'aws', label: 'AWS', section: '접속 계정' },
 ];
 const SECTIONS = ['기본', '연락처', '접속 계정'];
@@ -90,9 +91,13 @@ export default function Users() {
                   <td className="nowrap small">{u.affiliation}</td>
                   <td className="nowrap small">{u.joinDate ?? '-'}</td>
                   <td className="nowrap small">{u.leaveDate ?? '-'}</td>
-                  <td className="small">{u.kraftonAccount ?? '-'}</td>
+                  <td className="nowrap small">
+                    <CopyText value={u.kraftonAccount} />
+                  </td>
                   <td className="nowrap small">{u.phone ?? '-'}</td>
-                  <td className="small">{u.groveMail ?? '-'}</td>
+                  <td className="nowrap small">
+                    <CopyText value={u.groveMail} />
+                  </td>
                   <td className="nowrap small">{u.mustChangePassword ? <span className="flag flag-warn">초기값</span> : <span className="muted">변경됨</span>}</td>
                 </tr>
               ))}
@@ -254,7 +259,7 @@ function UserDialog({ user, onClose, onChanged }: { user?: AppUser; onClose: () 
                 <KVGrid>
                   {FIELDS.filter((f) => f.section === s).map((f) => (
                     <KV key={f.key} label={f.label}>
-                      {user[f.key] as string | null}
+                      {f.copy && user[f.key] ? <CopyText value={user[f.key] as string} /> : (user[f.key] as string | null)}
                     </KV>
                   ))}
                 </KVGrid>

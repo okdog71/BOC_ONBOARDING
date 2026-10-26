@@ -489,3 +489,10 @@ button.link:hover { text-decoration: underline; }
 .act-UPDATE { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .act-DELETE { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); background: color-mix(in srgb, var(--danger) 10%, transparent); }
 .pager { display: flex; justify-content: center; align-items: center; gap: var(--space-3); margin: var(--space-4) 0; }
+
+/* ---- 복사 아이콘 ---- */
+.copy-text { display: inline-flex; align-items: center; gap: 4px; }
+.copy-btn { display: inline-flex; align-items: center; padding: 2px; border: 0; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; line-height: 0; }
+.copy-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.copy-btn.done { color: var(--ok); }
+.copy-btn.fail { color: var(--warn); }
